@@ -1,0 +1,343 @@
+/* ============================================================
+   Rewind 组件样式 — 扫描页 / 报告页 / 证据展开
+   全部由 tokens.css 驱动，无硬编码颜色
+   ============================================================ */
+
+/* ---------- 扫描页：阶段进度 ---------- */
+
+.scan-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .scan-layout { grid-template-columns: 1fr; }
+}
+
+.phase-list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  overflow: hidden;
+}
+
+.phase-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: var(--fg-subtle);
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.phase-item:last-child { border-bottom: none; }
+
+.phase-item.done { color: var(--fg-muted); }
+.phase-item.active { color: var(--fg); background: var(--bg-hover); }
+
+.phase-icon {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+}
+
+.phase-item.done .phase-icon { color: var(--success); }
+.phase-item.active .phase-icon { color: var(--warning); }
+.phase-item.pending .phase-icon { color: var(--fg-subtle); }
+
+.spinner {
+  width: 12px; height: 12px;
+  border: 2px solid var(--border);
+  border-top-color: var(--warning);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 3s; }
+}
+
+/* ---------- 扫描页：工具日志 ---------- */
+
+.tool-log {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-inset);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  padding: var(--space-4);
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.log-line { display: flex; gap: var(--space-2); align-items: baseline; }
+.log-line .log-n { color: var(--fg-subtle); flex-shrink: 0; min-width: 3ch; text-align: right; }
+.log-call { color: var(--fg); }
+.log-call .log-args { color: var(--fg-subtle); }
+.log-result { color: var(--fg-muted); }
+.log-result.ok { color: var(--success); }
+.log-result.fail { color: var(--danger); }
+.log-result .log-ms { color: var(--fg-subtle); }
+.log-note { color: var(--accent); }
+.log-error { color: var(--danger); }
+
+/* ---------- 报告页 ---------- */
+
+.report-header {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-subtle);
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.report-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin: 0 0 var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.report-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-3);
+}
+
+.chip-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+.goal-box {
+  border-left: 3px solid var(--border);
+  padding: var(--space-2) var(--space-4);
+  color: var(--fg-muted);
+  margin: var(--space-3) 0 0;
+}
+
+.goal-box strong { color: var(--fg); font-weight: 600; }
+
+.section-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  margin: var(--space-6) 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.summary-block {
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  padding: var(--space-4) var(--space-5);
+  color: var(--fg);
+  line-height: 1.8;
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+/* ---------- 状态分区 ---------- */
+
+.status-section { margin-bottom: var(--space-5); }
+
+.status-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-1);
+}
+
+.status-count {
+  font-size: var(--text-sm);
+  color: var(--fg-subtle);
+  font-family: var(--font-mono);
+}
+
+.st-done    { color: var(--success); }
+.st-fail    { color: var(--danger); }
+.st-suspect { color: var(--warning); }
+.st-unknown { color: var(--neutral); }
+
+/* ---------- 判断行（可展开） ---------- */
+
+.finding-row {
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.finding-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-1);
+  background: none;
+  border: none;
+  color: var(--fg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.finding-head:hover { background: var(--bg-hover); }
+
+.finding-title { flex: 1; font-weight: 500; }
+
+.finding-area {
+  font-size: var(--text-xs);
+  color: var(--fg-subtle);
+  border: 1px solid var(--border);
+  padding: 1px var(--space-2);
+  border-radius: 999px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+.chevron {
+  color: var(--fg-subtle);
+  flex-shrink: 0;
+  transition: transform var(--duration) ease-out;
+}
+
+.finding-row.open .chevron { transform: rotate(90deg); }
+
+.finding-body {
+  padding: 0 var(--space-4) var(--space-4);
+  color: var(--fg-muted);
+}
+
+.finding-detail { margin: 0 0 var(--space-3); }
+.finding-reason {
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--border-muted);
+  color: var(--fg-subtle);
+}
+
+/* ---------- 证据（产品特色） ---------- */
+
+.evidence-list { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.evidence-item {
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.evidence-file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.evidence-lines { color: var(--accent); flex-shrink: 0; }
+.evidence-note { color: var(--fg-subtle); font-family: var(--font-sans); margin-left: auto; font-size: var(--text-xs); text-align: right; }
+
+.evidence-snippet {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-inset);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+}
+
+.evidence-empty { color: var(--fg-subtle); font-style: italic; }
+
+/* ---------- 建议 ---------- */
+
+.suggestion-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  overflow: hidden;
+}
+
+.suggestion-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: none;
+  border: none;
+  color: var(--fg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestion-head:hover { background: var(--bg-hover); }
+
+.suggestion-idx {
+  font-family: var(--font-mono);
+  color: var(--fg-subtle);
+  flex-shrink: 0;
+}
+
+.suggestion-body {
+  padding: 0 var(--space-5) var(--space-4);
+  color: var(--fg-muted);
+}
+
+.suggestion-body h4 {
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.dep-row { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.dep-chip {
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  padding: 1px var(--space-2);
+}
+
+/* ---------- 目标补充 ---------- */
+
+.goal-form { display: flex; gap: var(--space-2); margin-top: var(--space-3); }
+.goal-form input { flex: 1; }
+
+/* ---------- 轨迹折叠 ---------- */
+
+.trace-fold summary {
+  cursor: pointer;
+  color: var(--fg-subtle);
+  font-size: var(--text-sm);
+  padding: var(--space-2) 0;
+  user-select: none;
+}
+
+.trace-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.trace-table td {
+  border-top: 1px solid var(--border-muted);
+  padding: var(--space-2) var(--space-3);
+  vertical-align: top;
+}
+.trace-table td:first-child { color: var(--fg-subtle); font-family: var(--font-mono); white-space: nowrap; }
+.trace-summary-ok { color: var(--fg-muted); }
+.trace-summary-fail { color: var(--danger); }

@@ -1,0 +1,122 @@
+/* 补充样式：Home / Report 头部等（与 tokens 保持一致） */
+
+/* ---------- 首页 hero ---------- */
+
+.hero {
+  padding: var(--space-8) 0 var(--space-7);
+}
+
+.hero h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-3);
+  line-height: 1.25;
+}
+
+.hero-sub {
+  font-size: var(--text-md);
+  color: var(--fg-muted);
+  margin: 0 0 var(--space-6);
+  max-width: 34em;
+}
+
+.path-row {
+  display: flex;
+  gap: var(--space-2);
+  max-width: 620px;
+}
+
+.recent {
+  margin-top: var(--space-7);
+}
+
+.recent h2 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--space-2);
+}
+
+/* ---------- 通用横幅 ---------- */
+
+.banner {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+}
+
+.banner-error {
+  border-color: rgba(248, 81, 73, 0.4);
+  background: rgba(248, 81, 73, 0.08);
+}
+
+/* ---------- 报告头部 meta ---------- */
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin: var(--space-4) 0;
+}
+
+.meta-label {
+  font-size: var(--text-xs);
+  color: var(--fg-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.meta-value {
+  font-size: var(--text-base);
+  color: var(--fg);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
+  background: var(--bg-subtle);
+}
+
+/* ---------- 项目目标 ---------- */
+
+.goal-box {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.goal-src {
+  display: inline-block;
+  margin-left: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--fg-subtle);
+}
+
+/* ---------- 建议组 ---------- */
+
+.suggestion-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-top: var(--space-3);
+}

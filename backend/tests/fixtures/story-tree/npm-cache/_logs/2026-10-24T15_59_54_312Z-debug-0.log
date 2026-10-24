@@ -1,0 +1,17 @@
+0 verbose cli D:\Program Files\nodejs\node.exe D:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.13.0
+2 info using node@v24.16.0
+3 silly config load:file:D:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\34505\.zcode\workspace\draft-***\rewind\rewind\backend\tests\fixtures\story-tree\.npmrc
+5 silly config load:file:C:\Users\34505\.zcode\workspace\draft-***\rewind\rewind\backend\tests\fixtures\story-tree\${APPDATA}\npm\etc\npmrc
+6 verbose title npm run build
+7 verbose argv "run" "build"
+8 verbose logfile logs-max:10 dir:C:\Users\34505\.zcode\workspace\draft-***\rewind\rewind\backend\tests\fixtures\story-tree\npm-cache\_logs\2026-10-24T15_59_54_312Z-
+9 verbose logfile C:\Users\34505\.zcode\workspace\draft-***\rewind\rewind\backend\tests\fixtures\story-tree\npm-cache\_logs\2026-10-24T15_59_54_312Z-debug-0.log
+10 silly logfile done cleaning log files
+11 verbose cwd C:\Users\34505\.zcode\workspace\draft-***\rewind\rewind\backend\tests\fixtures\story-tree
+12 verbose os Windows_NT 10.0.26100
+13 verbose node v24.16.0
+14 verbose npm  v11.13.0
+15 verbose exit 1
+16 verbose code 1

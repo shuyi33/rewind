@@ -1,0 +1,39 @@
+/* 设计 token —— GitHub dark 风格
+   全站颜色/字号/圆角/动效只从这里取值，组件层不写魔法数 */
+
+:root {
+  /* 颜色 */
+  --bg: #0d1117;
+  --bg-subtle: #161b22;
+  --bg-inset: #010409;
+  --bg-hover: #1c2128;
+  --fg: #e6edf3;
+  --fg-muted: #8b949e;
+  --fg-subtle: #6e7681;
+  --border: #30363d;
+  --border-muted: #21262d;
+  --accent: #2f81f7;
+  --success: #3fb950;
+  --danger: #f85149;
+  --warning: #d29922;
+  --neutral: #8b949e;
+
+  /* 字体 */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+
+  /* 字号 */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-base: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+
+  /* 圆角 / 动效 */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --duration: 150ms;
+}
