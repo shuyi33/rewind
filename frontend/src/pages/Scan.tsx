@@ -17,7 +17,7 @@ export default function Scan() {
   const scanPath = typeof window !== 'undefined' ? sessionStorage.getItem('rewind:scan-path') : null
 
   useEffect(() => {
-    if (!reportId || navigated.current) return
+    if (!reportId) return
     const cleanup = subscribeEvents(
       reportId,
       (ev: AgentEvent) => {
