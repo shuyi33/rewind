@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from tools.registry import execute_tool, TOOLS, tool_specs  # noqa: E402
 
-FIXTURE = str(Path(__file__).parent / "fixtures" / "story-tree")
+FIXTURE = str(Path(__file__).parent / "fixtures" / "pocket-ledger")
 
 
 def show(title, res, keys=None):

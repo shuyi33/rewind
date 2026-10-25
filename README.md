@@ -148,7 +148,7 @@ python tests/test_phase3_tools.py      # 6 工具 + 安全边界
 python tests/test_phase4_agent_loop.py # Agent Loop 端到端（Mock 模式）
 ```
 
-`tests/fixtures/story-tree/` 是一个内置的"烂尾样例项目"（README 目标 + cover 数据层完成但 UI 缺失 + 空实现 + 未引用组件 + 5 个月前的 Git 历史），用于全链路验证。
+`tests/fixtures/pocket-ledger/` 是一个内置的"烂尾样例项目"（README 目标 + cover 数据层完成但 UI 缺失 + 空实现 + 未引用组件 + 5 个月前的 Git 历史），用于全链路验证。
 
 ## API 一览
 

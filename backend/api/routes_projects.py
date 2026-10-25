@@ -23,6 +23,6 @@ def list_projects():
 
 @router.get("/demo")
 def demo_project():
-    """内置烂尾样例（story-tree）的绝对路径，供首页「诊断样例」卡片直连扫描。"""
-    fixture = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "story-tree"
+    """内置烂尾样例（pocket-ledger 口袋账本）的绝对路径，供首页「诊断样例」卡片直连扫描。"""
+    fixture = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "pocket-ledger"
     return {"path": str(fixture), "available": fixture.is_dir()}

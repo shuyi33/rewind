@@ -11,6 +11,7 @@ type SettingsState = {
 }
 
 const PRESETS = [
+  { name: 'OpenRouter', url: 'https://openrouter.ai/api/v1', model: 'deepseek/deepseek-chat' },
   { name: 'DeepSeek', url: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
   { name: '智谱 GLM', url: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4.5' },
   { name: 'OpenAI', url: 'https://api.openai.com/v1', model: 'gpt-4o' },

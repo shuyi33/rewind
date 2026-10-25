@@ -1,6 +1,6 @@
 """初始化测试 fixture 的 Git 历史（幂等，可重复执行）。
 
-story-tree 是内置的"烂尾样例项目"：4 次提交、最后一次停在
+pocket-ledger 是内置的"烂尾样例项目"：4 次提交、最后一次停在
 "wip: 图表页骨架（烂尾于此）"，日期倒填到约 5 个月前（触发"已搁置"判定）。
 
 Git 仓库无法嵌套提交，因此 .git 不进版本库，跑测试前先执行本脚本：
@@ -12,7 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-FIXTURE = Path(__file__).resolve().parent / "fixtures" / "story-tree"
+FIXTURE = Path(__file__).resolve().parent / "fixtures" / "pocket-ledger"
 
 COMMITS = [
     ("2026-05-06T10:00:00+08:00", "init: 项目脚手架（Vite + React）",
