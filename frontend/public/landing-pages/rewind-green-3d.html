@@ -788,7 +788,7 @@
           <circle cx="15" cy="15" r="1.1" fill="currentColor" stroke="none"/>
         </svg>
       </span>
-      <div><dt>最后一次提交</dt><dd>157 天前</dd></div>
+      <div><dt>最后一次提交</dt><dd id="rw-stat-days">157 天前</dd></div>
     </dl>
 
     <dl class="stat stat--b mask" style="--d:770ms; --pd:13">
@@ -801,7 +801,7 @@
           <circle cx="15" cy="15" r="3.6"/>
         </svg>
       </span>
-      <div><dt>显式 TODO</dt><dd>7 处待办</dd></div>
+      <div><dt>显式 TODO</dt><dd id="rw-stat-todo">7 处待办</dd></div>
     </dl>
 
     <article class="card card--stove mask" style="--d:880ms; --pd:22; --pr:2.4">
@@ -4268,6 +4268,14 @@ window.__seek   = v => { clock = v; drawn = null; };
   });
   var stove = document.querySelector('.card--stove');
   if(stove){ stove.addEventListener('click', function(){ send({ type: 'rewind:demo' }); }); }
+  window.addEventListener('message', function(e){
+    var d = e.data || {};
+    if(d.type !== 'rewind:stats') return;
+    var dd1 = document.getElementById('rw-stat-days');
+    var dd2 = document.getElementById('rw-stat-todo');
+    if(dd1 && d.days != null) dd1.textContent = d.days + ' 天前';
+    if(dd2 && d.todo != null) dd2.textContent = d.todo + ' 处待办';
+  });
   document.querySelectorAll('[data-rw]').forEach(function(el){
     el.addEventListener('click', function(ev){ ev.preventDefault(); send({ type: 'rewind:nav', to: el.getAttribute('data-rw') }); });
   });

@@ -16,6 +16,7 @@ export default function Home() {
   const [projects, setProjects] = useState<ProjectInfo[]>([])
   const [hint, setHint] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const frameRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
     rewindApi.listProjects().then((r) => setProjects(r.projects)).catch(() => {})
@@ -24,6 +25,18 @@ export default function Home() {
       .then((h) => {
         if (!h.llm_configured) setHint('LLM 未配置：在 backend/.env 填入 LLM_API_KEY，或设 REWIND_MOCK_LLM=1')
         else if (h.mock) setHint('Mock 引擎运行中 — 流程完整，判断为演示级别')
+      })
+      .catch(() => {})
+
+    // 内置样例的真实统计（TODO 数 / 搁置天数）同步进场景卡片
+    rewindApi
+      .demoProject()
+      .then((d) => {
+        if (!d.available) return
+        frameRef.current?.contentWindow?.postMessage(
+          { type: 'rewind:stats', days: d.last_commit_days, todo: d.todo_count },
+          '*',
+        )
       })
       .catch(() => {})
 
@@ -113,10 +126,23 @@ export default function Home() {
     <main className="sylva-home">
       <section className="sylva-hero" aria-label="Rewind · 回溯">
         <iframe
+          ref={frameRef}
           src="/landing-pages/rewind-green-3d.html"
           title="Rewind · 回溯 — 把烂尾的项目重新看清楚"
           sandbox="allow-downloads allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
           loading="eager"
+          onLoad={() => {
+            rewindApi
+              .demoProject()
+              .then((d) => {
+                if (!d.available) return
+                frameRef.current?.contentWindow?.postMessage(
+                  { type: 'rewind:stats', days: d.last_commit_days, todo: d.todo_count },
+                  '*',
+                )
+              })
+              .catch(() => {})
+          }}
         />
       </section>
 

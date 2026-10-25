@@ -29,7 +29,16 @@ export const rewindApi = {
 
   listProjects: () => api<{ projects: ProjectInfo[] }>('/api/projects'),
 
-  demoProject: () => api<{ path: string; available: boolean }>('/api/projects/demo'),
+  demoProject: () =>
+    api<{ path: string; available: boolean; todo_count: number | null; last_commit_days: number | null }>(
+      '/api/projects/demo',
+    ),
+
+  testLLM: (body: { base_url?: string; api_key?: string; model?: string }) =>
+    api<{ ok: boolean; detail: string }>('/api/settings/test', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
 
   getSettings: () =>
     api<{ base_url: string; model: string; mock: boolean; has_key: boolean; api_key_masked: string }>(

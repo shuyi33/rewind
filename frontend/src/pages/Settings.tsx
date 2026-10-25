@@ -28,6 +28,8 @@ export default function Settings() {
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
+  const [testing, setTesting] = useState(false)
+  const [testResult, setTestResult] = useState<{ ok: boolean; detail: string } | null>(null)
 
   useEffect(() => {
     rewindApi
@@ -40,6 +42,19 @@ export default function Settings() {
       })
       .catch(() => setErr('无法加载设置'))
   }, [])
+
+  async function testConnection() {
+    setTesting(true)
+    setTestResult(null)
+    try {
+      const r = await rewindApi.testLLM({ base_url: baseUrl, api_key: apiKey || undefined, model })
+      setTestResult(r)
+    } catch (e) {
+      setTestResult({ ok: false, detail: e instanceof Error ? e.message : '测试请求失败' })
+    } finally {
+      setTesting(false)
+    }
+  }
 
   async function save() {
     setSaving(true)
@@ -112,7 +127,8 @@ export default function Settings() {
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder={state?.has_key ? `${state.api_key_masked} — 留空保持不变` : 'sk-…'}
+            onBlur={() => { if (apiKey.trim().length > 10) void testConnection() }}
+            placeholder={state?.has_key ? `${state.api_key_masked} — 留空保持不变` : 'sk-… 粘贴后自动测试连接'}
             spellCheck={false}
             autoComplete="off"
           />
@@ -134,12 +150,20 @@ export default function Settings() {
         </label>
 
         <div className="settings-actions">
+          <button className="settings-test" onClick={testConnection} disabled={testing}>
+            {testing ? '测试中…' : '测试连接'}
+          </button>
           <button className="settings-save" onClick={save} disabled={saving}>
             {saving ? '保存中…' : '保存并生效'}
           </button>
-          {msg && <span className="settings-msg">{msg}</span>}
-          {err && <span className="settings-err" role="alert">{err}</span>}
         </div>
+        {testResult && (
+          <p className={testResult.ok ? 'settings-msg' : 'settings-err'} role="status">
+            {testResult.ok ? '✓ ' : '✕ '}{testResult.detail}
+          </p>
+        )}
+        {msg && <p className="settings-msg">{msg}</p>}
+        {err && <p className="settings-err" role="alert">{err}</p>}
 
         <p className="settings-note">
           配置写入 <code>backend/.env</code>，保存后立即生效（无需重启）。Key 只保存在你本机。

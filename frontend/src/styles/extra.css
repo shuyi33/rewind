@@ -447,7 +447,7 @@
   gap: 12px;
   padding: 16px 16px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(26, 34, 15, 0.97), rgba(18, 24, 10, 0.97));
+  background: #131a0d;
   border: 1px solid rgba(183, 217, 138, 0.25);
   box-shadow: 0 16px 40px rgba(3, 7, 1, 0.5);
 }
@@ -811,3 +811,20 @@
 
 .settings-note { font-size: 12px; color: #75855f; margin: 0; }
 .settings-note code { font-family: 'Lexend', ui-monospace, Consolas, monospace; font-size: 11px; color: #a4b58c; }
+
+.settings-test {
+  font-family: inherit;
+  font-size: 13.5px;
+  color: #d8e4c4;
+  background: transparent;
+  border: 1px solid rgba(183, 217, 138, 0.35);
+  border-radius: 999px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+}
+
+.settings-test:hover:not(:disabled) { border-color: rgba(183, 217, 138, 0.6); background: rgba(183, 217, 138, 0.06); }
+.settings-test:disabled { opacity: 0.6; cursor: wait; }
+
+.settings-actions p { margin: 0; }

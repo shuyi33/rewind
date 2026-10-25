@@ -22,7 +22,21 @@ def list_projects():
 
 
 @router.get("/demo")
-def demo_project():
-    """内置烂尾样例（pocket-ledger 口袋账本）的绝对路径，供首页「诊断样例」卡片直连扫描。"""
+async def demo_project():
+    """内置烂尾样例（pocket-ledger 口袋账本）：路径 + 真实统计（TODO 数、搁置天数），供首页场景卡片同步显示。"""
     fixture = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "pocket-ledger"
-    return {"path": str(fixture), "available": fixture.is_dir()}
+    if not fixture.is_dir():
+        return {"path": str(fixture), "available": False, "todo_count": None, "last_commit_days": None}
+
+    from tools.registry import execute_tool
+
+    todo = await execute_tool(str(fixture), "search_project", {"query": "TODO|FIXME", "regex": True})
+    git = await execute_tool(str(fixture), "analyze_git_history", {})
+    todo_count = (todo.get("result") or {}).get("total_matches_shown") if todo.get("ok") else None
+    last_commit = (git.get("result") or {}).get("last_commit") or {}
+    return {
+        "path": str(fixture),
+        "available": True,
+        "todo_count": todo_count,
+        "last_commit_days": last_commit.get("days_ago"),
+    }

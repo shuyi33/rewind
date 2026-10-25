@@ -82,3 +82,41 @@ def save_settings(req: LLMSettingsRequest):
         os.environ[k] = v
     reload_settings()
     return _current()
+
+
+class LLMTestRequest(BaseModel):
+    base_url: str | None = None
+    api_key: str | None = None  # 空 = 使用已保存的 Key
+    model: str | None = None
+
+
+@router.post("/test")
+async def test_llm(req: LLMTestRequest):
+    """连通性测试：用表单当前值（未填的项回退已保存配置）发一条 1-token 迷你请求。
+
+    不用 models.list —— 部分服务（如 OpenRouter）该端点不校验 Key，假 Key 也会通过。
+    """
+    s = config_module.settings
+    base = (req.base_url or s.LLM_BASE_URL).strip().rstrip("/")
+    key = (req.api_key or "").strip() or s.LLM_API_KEY
+    model = (req.model or s.LLM_MODEL).strip()
+    if not key:
+        return {"ok": False, "detail": "没有可用的 API Key"}
+    if not base:
+        return {"ok": False, "detail": "没有 API 地址"}
+    if not model:
+        return {"ok": False, "detail": "没有模型名"}
+
+    from openai import AsyncOpenAI
+
+    try:
+        client = AsyncOpenAI(base_url=base, api_key=key, timeout=20)
+        resp = await client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": "ping"}],
+            max_tokens=1,
+        )
+        n = len(resp.choices) if resp.choices else 0
+        return {"ok": True, "detail": f"连接成功：{model} 可用（返回 {n} 条候选）"}
+    except Exception as e:  # noqa: BLE001 — 网络/鉴权/模型名错误统一回报
+        return {"ok": False, "detail": f"连接失败：{e}"}
