@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { rewindApi } from '../api/client'
 import type { ProjectInfo, ValidateResult } from '../types'
@@ -11,6 +11,8 @@ export default function Home() {
   const [projects, setProjects] = useState<ProjectInfo[]>([])
   const [llmReady, setLlmReady] = useState<boolean | null>(null)
   const [mock, setMock] = useState(false)
+  const toolRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const refresh = () => rewindApi.listProjects().then((r) => setProjects(r.projects)).catch(() => {})
 
@@ -23,6 +25,18 @@ export default function Home() {
       })
       .catch(() => setLlmReady(false))
     refresh()
+  }, [])
+
+  // hero（iframe 内 Sylva 世界）的「开始回溯 / 回溯」按钮 → 平滑滚动到工具区
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      if ((e.data as { type?: string })?.type === 'rewind:enter') {
+        toolRef.current?.scrollIntoView({ behavior: 'smooth' })
+        window.setTimeout(() => inputRef.current?.focus(), 650)
+      }
+    }
+    window.addEventListener('message', onMsg)
+    return () => window.removeEventListener('message', onMsg)
   }, [])
 
   async function start() {
@@ -73,67 +87,97 @@ export default function Home() {
   }
 
   return (
-    <main className="page">
-      <section style={{ textAlign: 'center', paddingTop: 'var(--space-7)', paddingBottom: 'var(--space-7)' }}>
-        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>
-          重新捡起一个项目。
-        </h1>
-        <p className="muted" style={{ fontSize: 'var(--text-md)', marginTop: 'var(--space-3)' }}>
-          让 Rewind 先替你弄清楚，它现在到底做到哪了。
-        </p>
+    <main className="sylva-home">
+      <section className="sylva-hero" aria-label="Rewind · 回溯 主视觉">
+        <iframe
+          src="/landing-pages/rewind-green-3d.html"
+          title="Rewind · 回溯 — 把烂尾的项目重新看清楚"
+          sandbox="allow-downloads allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
+          loading="eager"
+        />
+      </section>
 
-        <div style={{ maxWidth: 560, margin: 'var(--space-6) auto 0', textAlign: 'left' }}>
-          <label htmlFor="project-path" className="subtle" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+      <div className="tool-sec" ref={toolRef}>
+        <section className="tool-panel">
+          <p className="tool-kicker">EVIDENCE-BASED RECOVERY</p>
+          <h2 className="tool-h">回溯一个项目</h2>
+          <p className="tool-sub">
+            输入本机项目文件夹路径，Rewind 会用真实证据——代码、Git 历史、TODO、构建状态——重建它的现状。
+          </p>
+
+          <label htmlFor="project-path" className="tool-label">
             项目文件夹路径（Rewind 在本机运行，可直接读取该目录）
           </label>
-          <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+          <div className="tool-launch">
             <input
+              ref={inputRef}
               id="project-path"
-              className="input"
-              placeholder="例如 /Users/me/projects/story-tree"
+              className="tool-input"
+              placeholder="例如 D:\Projects\story-tree"
               value={path}
               onChange={(e) => setPath(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && start()}
               spellCheck={false}
             />
-            <button className="btn btn-primary btn-lg" onClick={start} disabled={checking}>
+            <button className="tool-btn" onClick={start} disabled={checking}>
               {checking ? '正在检查…' : '开始回溯'}
             </button>
           </div>
           {error && (
-            <p style={{ color: 'var(--danger)', fontSize: 'var(--text-sm)', margin: 'var(--space-3) 0 0' }}>{error}</p>
+            <p className="tool-error" role="alert">
+              {error}
+            </p>
           )}
           {llmReady === false && (
-            <div className="panel" style={{ marginTop: 'var(--space-4)', padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--fg-muted)' }}>
+            <div className="tool-note">
               尚未配置 LLM：请在 <code>backend/.env</code> 中设置 <code>LLM_API_KEY</code>
               （详见 <code>.env.example</code>）。未配置时无法执行智能诊断。
             </div>
           )}
           {mock && (
-            <div className="panel" style={{ marginTop: 'var(--space-4)', padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--fg-muted)' }}>
+            <div className="tool-note">
               当前运行在 <b>Mock LLM 模式</b>（REWIND_MOCK_LLM=1）：Agent 流程完整可用，但判断质量为演示级别。
             </div>
           )}
-        </div>
-      </section>
+        </section>
 
-      <section style={{ marginTop: 'var(--space-6)' }}>
-        <h2 style={{ fontSize: 'var(--text-md)', fontWeight: 600, margin: '0 0 var(--space-3)' }}>最近的项目</h2>
-        {projects.length === 0 ? (
-          <p className="subtle" style={{ margin: 0 }}>还没有分析过任何项目。</p>
-        ) : (
-          <div className="panel">
-            {projects.map((p) => (
-              <button key={p.id} className="list-row" style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: '1px solid var(--border-muted)', cursor: 'pointer', textAlign: 'left', font: 'inherit', color: 'inherit' }} onClick={() => openRecent(p)}>
-                <span className="status-dot" style={{ background: p.last_report_status === 'completed' ? 'var(--success)' : p.last_report_status === 'failed' ? 'var(--danger)' : p.last_report_status === 'running' ? 'var(--warning)' : 'var(--neutral)' }} />
-                <span style={{ fontWeight: 600 }}>{p.name}</span>
-                <span className="mono-sm subtle" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.path}</span>
-                <span className="subtle" style={{ flexShrink: 0 }}>{p.last_analyzed_at ?? '未分析'}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
+        <section className="tool-panel">
+          <h2 className="tool-h tool-h--sm">最近的项目</h2>
+          {projects.length === 0 ? (
+            <p className="tool-empty">还没有分析过任何项目。</p>
+          ) : (
+            <div className="tool-list">
+              {projects.map((p) => (
+                <button key={p.id} className="tool-row" onClick={() => openRecent(p)}>
+                  <span
+                    className="tool-dot"
+                    data-status={
+                      p.last_report_status === 'completed'
+                        ? 'done'
+                        : p.last_report_status === 'failed'
+                          ? 'failed'
+                          : p.last_report_status === 'running'
+                            ? 'running'
+                            : 'none'
+                    }
+                  />
+                  <span className="tool-name">{p.name}</span>
+                  <span className="tool-path">{p.path}</span>
+                  <span className="tool-time">{p.last_analyzed_at ?? '未分析'}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <footer className="tool-foot">
+          Rewind · 回溯 — Project Recovery Agent · 苔藓世界场景由{' '}
+          <a href="https://threeui.com" target="_blank" rel="noreferrer">
+            ThreeUI
+          </a>
+          （Sylva，MIT）驱动
+        </footer>
+      </div>
     </main>
   )
 }
