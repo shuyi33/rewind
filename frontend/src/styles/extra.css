@@ -582,3 +582,52 @@
   .diag-root { position: static; width: auto !important; margin-bottom: 18px; }
   .diag-nodes { position: static; }
 }
+
+.scan-next {
+  max-width: 1020px;
+  margin: 28px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.scan-next-btn {
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #f0f2ec;
+  background: linear-gradient(180deg, #4a554b, #303a31 55%, #262f28);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 11px 30px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -8px 14px rgba(0, 0, 0, 0.28), 0 6px 20px rgba(10, 15, 8, 0.45);
+  transition: box-shadow 0.25s, transform 0.15s;
+}
+
+.scan-next-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(115deg, rgba(255, 130, 120, 0.5), rgba(255, 220, 130, 0.32), rgba(130, 255, 200, 0.42), rgba(130, 185, 255, 0.5));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.scan-next-btn:hover {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -8px 14px rgba(0, 0, 0, 0.3), 0 8px 26px rgba(10, 15, 8, 0.55);
+}
+
+.scan-next-btn:active { transform: translateY(1px) scale(0.98); }
+
+.scan-next-home { font-size: 13px; color: #93a37c; }
+.scan-next-home:hover { color: #cfe0b4; }
