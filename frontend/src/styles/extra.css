@@ -828,3 +828,9 @@
 .settings-test:disabled { opacity: 0.6; cursor: wait; }
 
 .settings-actions p { margin: 0; }
+
+.settings-keylen {
+  float: right;
+  font-size: 11.5px;
+  color: #75855f;
+}

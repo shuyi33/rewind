@@ -119,4 +119,11 @@ async def test_llm(req: LLMTestRequest):
         n = len(resp.choices) if resp.choices else 0
         return {"ok": True, "detail": f"连接成功：{model} 可用（返回 {n} 条候选）"}
     except Exception as e:  # noqa: BLE001 — 网络/鉴权/模型名错误统一回报
-        return {"ok": False, "detail": f"连接失败：{e}"}
+        msg = str(e)
+        # OpenRouter 对无效/不完整 Key 报 "Missing Authentication header"，极具误导性
+        if "401" in msg or "Authentication" in msg or "User not found" in msg:
+            if "openrouter" in base:
+                return {"ok": False, "detail": "Key 无效或复制不完整 —— OpenRouter 的 Key 以 sk-or-v1- 开头、约 70+ 字符；"
+                                               "且只在创建时完整显示一次，若当时没保存请到 openrouter.ai/keys 重新生成"}
+            return {"ok": False, "detail": "Key 无效或未授权（401）——请检查 Key 是否复制完整、是否属于该服务商"}
+        return {"ok": False, "detail": f"连接失败：{msg}"}

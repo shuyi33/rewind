@@ -121,7 +121,10 @@ export default function Settings() {
         </label>
 
         <label className="settings-field">
-          <span className="settings-label">API Key</span>
+          <span className="settings-label">
+            API Key
+            {apiKey.length > 0 && <span className="settings-keylen">已输入 {apiKey.length} 字符{apiKey.startsWith('sk-or-v1-') ? ' · 格式正确' : ''}</span>}
+          </span>
           <input
             className="settings-input"
             type="password"
