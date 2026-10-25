@@ -170,7 +170,7 @@ def build_heuristic_report(collected: list[dict], project_root: str = "") -> dic
             "area": "规划",
             "evidence": [{
                 "file": "README.md", "lines": None,
-                "note": f"checklist 中 {todo} 个未勾选项（如封面、编辑器、我的作品、导出）",
+                "note": f"checklist 中 {todo} 个未勾选项（如预算、图表、归档、导出）",
             }],
             "reasoning": "来自 README 实际文本；完成度对应关系需要进一步代码核实。",
         })

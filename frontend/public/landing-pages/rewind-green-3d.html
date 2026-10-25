@@ -729,19 +729,19 @@
           <path d="M9.6 12.55h2.8v4.2c1.35.3 2.45 1.15 3.15 2.4-1.35.4-2.4.15-3.15-.4v4.15H9.6v-4.15c-.75.55-1.8.8-3.15.4.7-1.25 1.8-2.1 3.15-2.4v-4.2Z"/>
         </svg>
       </a>
-      <a class="dock-item is-active" data-dock data-spec data-burst href="#" style="--d:180ms">
+      <a class="dock-item is-active" data-dock data-spec data-burst href="#" style="--d:180ms" data-rw="home">
         <span class="glyph" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M8 14V9"/><path d="M8 9c0-2.4 1.7-4.3 4-4.3.2 2.6-1.6 4.6-4 4.3Z"/><path d="M8 10.5C7.9 8.4 6.4 6.8 4.4 6.8 4.3 8.9 5.9 10.6 8 10.5Z"/></svg>
         </span>
         <span>诊断</span>
       </a>
-      <a class="dock-item" data-dock data-spec data-burst href="#" style="--d:230ms">
+      <a class="dock-item" data-dock data-spec data-burst href="#" style="--d:230ms" data-rw="scan">
         <span class="glyph" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M1.6 12.4c2.4-3.4 4.3-5.1 5.7-5.1 2 0 3 3.6 5 3.6 1.1 0 1.9-.5 2.4-1.4"/><path d="M4.3 6.2C5.5 4.4 6.6 3.5 7.6 3.5c1.5 0 2.2 2.4 3.7 2.4"/></svg>
         </span>
         <span>证据</span>
       </a>
-      <a class="dock-item" data-dock data-spec data-burst href="#" style="--d:280ms">
+      <a class="dock-item" data-dock data-spec data-burst href="#" style="--d:280ms" data-rw="report">
         <span class="glyph" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M4 2.4h5.3L12 5.1v8.5H4z"/><path d="M9.2 2.4V5h2.7"/><path d="M6 8.4h4M6 10.8h2.8"/></svg>
         </span>
@@ -4277,7 +4277,7 @@ window.__seek   = v => { clock = v; drawn = null; };
 </script>
 
 <script>
-/* Rewind 桥接 v4：场景大按钮聚焦搜索栏；诊断样例卡直连回溯（不改动上游脚本） */
+/* Rewind 桥接 v5：dock 导航 / 大按钮聚焦 / 样例卡直连（不改动上游脚本） */
 (function(){
   function send(msg){ try{ parent.postMessage(msg, '*'); }catch(e){} }
   document.querySelectorAll('.liquid-button--explore, .dock-item--enter').forEach(function(el){
@@ -4285,6 +4285,9 @@ window.__seek   = v => { clock = v; drawn = null; };
   });
   var stove = document.querySelector('.card--stove');
   if(stove){ stove.addEventListener('click', function(){ send({ type: 'rewind:demo' }); }); }
+  document.querySelectorAll('[data-rw]').forEach(function(el){
+    el.addEventListener('click', function(ev){ ev.preventDefault(); send({ type: 'rewind:nav', to: el.getAttribute('data-rw') }); });
+  });
 })();
 </script>
 </body>

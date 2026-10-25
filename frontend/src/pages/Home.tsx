@@ -28,21 +28,35 @@ export default function Home() {
       .catch(() => {})
 
     const onMsg = (e: MessageEvent) => {
-      const t = (e.data as { type?: string })?.type
-      if (t === 'rewind:focus') {
+      const d = e.data as { type?: string; to?: string }
+      if (d?.type === 'rewind:focus') {
         inputRef.current?.focus()
         inputRef.current?.select()
-      } else if (t === 'rewind:demo') {
-        // 场景里「诊断样例 · Story Tree」卡片 → 直接回溯内置样例
+      } else if (d?.type === 'rewind:demo') {
+        // 场景里「诊断样例 · Pocket Ledger」卡片 → 直接回溯内置样例
         rewindApi
           .demoProject()
-          .then((d) => { if (d.available) void start(d.path) })
+          .then((r) => { if (r.available) void start(r.path) })
           .catch(() => setError('样例项目不可用'))
+      } else if (d?.type === 'rewind:nav') {
+        // 场景顶部 dock 横幅：诊断 / 证据 / 报告
+        if (d.to === 'home') {
+          navigate('/')
+        } else if (d.to === 'scan') {
+          const running = projects.find((p) => p.last_report_status === 'running' && p.last_report_id)
+          const any = running ?? projects.find((p) => p.last_report_id)
+          if (any?.last_report_id) navigate(`/scan/${any.last_report_id}`)
+          else inputRef.current?.focus()
+        } else if (d.to === 'report') {
+          const done = projects.find((p) => p.last_report_status === 'completed' && p.last_report_id)
+          if (done?.last_report_id) navigate(`/report/${done.last_report_id}`)
+          else inputRef.current?.focus()
+        }
       }
     }
     window.addEventListener('message', onMsg)
     return () => window.removeEventListener('message', onMsg)
-  }, [])
+  }, [projects])
 
   async function start(raw?: string) {
     const target = (raw ?? path).trim()

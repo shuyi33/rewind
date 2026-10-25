@@ -1,7 +1,7 @@
 """初始化测试 fixture 的 Git 历史（幂等，可重复执行）。
 
 story-tree 是内置的"烂尾样例项目"：4 次提交、最后一次停在
-"wip: 编辑器骨架（烂尾于此）"，日期倒填到约 5 个月前（触发"已搁置"判定）。
+"wip: 图表页骨架（烂尾于此）"，日期倒填到约 5 个月前（触发"已搁置"判定）。
 
 Git 仓库无法嵌套提交，因此 .git 不进版本库，跑测试前先执行本脚本：
     python tests/init_fixture_git.py
@@ -16,13 +16,13 @@ FIXTURE = Path(__file__).resolve().parent / "fixtures" / "story-tree"
 
 COMMITS = [
     ("2026-05-06T10:00:00+08:00", "init: 项目脚手架（Vite + React）",
-     ["package.json", "vite.config.ts", ".gitignore", "src/main.tsx", "src/types/story.ts"]),
-    ("2026-05-12T15:30:00+08:00", "feat: 故事数据层与 localStorage 存储",
-     ["src/services/story.ts", "src/utils/storage.ts", "src/components/CoverPreview.tsx"]),
-    ("2026-05-18T21:10:00+08:00", "feat: 首页与故事创建页",
-     ["README.md", "src/pages/Home.tsx", "src/pages/CreateStory.tsx"]),
-    ("2026-05-20T23:45:00+08:00", "wip: 编辑器骨架（烂尾于此）",
-     ["src/pages/Editor.tsx", "src/pages/MyWorks.tsx", "src/App.tsx", "tests/story.test.ts"]),
+     ["package.json", "vite.config.ts", ".gitignore", "src/main.tsx", "src/types/ledger.ts"]),
+    ("2026-05-12T15:30:00+08:00", "feat: 账目数据层与 localStorage 存储",
+     ["src/services/ledger.ts", "src/utils/storage.ts", "src/components/BudgetBadge.tsx"]),
+    ("2026-05-18T21:10:00+08:00", "feat: 首页与记一笔页",
+     ["README.md", "src/pages/Home.tsx", "src/pages/CreateEntry.tsx"]),
+    ("2026-05-20T23:45:00+08:00", "wip: 图表页骨架（烂尾于此）",
+     ["src/pages/Charts.tsx", "src/pages/Archive.tsx", "src/App.tsx", "tests/ledger.test.ts"]),
 ]
 
 
@@ -30,6 +30,9 @@ def main() -> int:
     if (FIXTURE / ".git").exists():
         print(f"[skip] {FIXTURE} 已有 .git，无需初始化")
         return 0
+
+    # 必须先 init 独立仓库——否则 git add 会向上找到外层主仓库，污染其历史
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=FIXTURE, check=True)
 
     env = dict(os.environ)
     for date, message, files in COMMITS:

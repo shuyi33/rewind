@@ -631,3 +631,15 @@
 
 .scan-next-home { font-size: 13px; color: #93a37c; }
 .scan-next-home:hover { color: #cfe0b4; }
+
+/* ===== 报告页：黑底 + 全直角 ===== */
+.report-dark {
+  min-height: 100vh;
+  background: #000;
+}
+
+.report-dark *,
+.report-dark *::before,
+.report-dark *::after {
+  border-radius: 0 !important;
+}

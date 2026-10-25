@@ -1,26 +1,26 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { loadStories } from '../utils/storage'
-import type { Story } from '../types/story'
+import { loadEntries } from '../utils/storage'
+import type { LedgerEntry } from '../types/ledger'
 
 export default function Home() {
-  const [stories, setStories] = useState<Story[]>([])
+  const [entries, setEntries] = useState<LedgerEntry[]>([])
 
   useEffect(() => {
-    setStories(loadStories())
+    setEntries(loadEntries())
   }, [])
 
   return (
     <main className="home">
-      <h1>剧情树</h1>
-      <p className="home__hint">制作分支剧情故事</p>
-      <Link className="btn btn--primary" to="/create">新建故事</Link>
+      <h1>口袋账本</h1>
+      <p className="home__hint">随手记一笔</p>
+      <Link className="btn btn--primary" to="/create">记一笔</Link>
 
-      <ul className="story-list">
-        {stories.map((s) => (
-          <li key={s.id} className="story-list__item">
-            <Link to={`/editor/${s.id}`}>{s.title}</Link>
-            <span className="story-list__summary">{s.summary}</span>
+      <ul className="entry-list">
+        {entries.map((e) => (
+          <li key={e.id} className="entry-list__item">
+            <Link to="/charts">{e.note}</Link>
+            <span className="entry-list__amount">{e.amount}</span>
           </li>
         ))}
       </ul>

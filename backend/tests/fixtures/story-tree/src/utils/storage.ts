@@ -1,8 +1,8 @@
-import type { Story } from '../types/story'
+import type { LedgerEntry } from '../types/ledger'
 
-const KEY = 'story-tree:stories'
+const KEY = 'pocket-ledger:entries'
 
-export function loadStories(): Story[] {
+export function loadEntries(): LedgerEntry[] {
   try {
     return JSON.parse(localStorage.getItem(KEY) ?? '[]')
   } catch {
@@ -10,6 +10,6 @@ export function loadStories(): Story[] {
   }
 }
 
-export function saveStories(stories: Story[]): void {
-  localStorage.setItem(KEY, JSON.stringify(stories))
+export function saveEntries(entries: LedgerEntry[]): void {
+  localStorage.setItem(KEY, JSON.stringify(entries))
 }

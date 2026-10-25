@@ -36,7 +36,7 @@ async def main():
     res = await execute_tool(FIXTURE, "read_project_file",
                              {"file_path": "README.md"})
     show("read_project_file (README.md)", res, ["file", "total_lines", "shown_range"])
-    assert res["ok"] and "剧情树" in res["result"]["content"]
+    assert res["ok"] and "口袋账本" in res["result"]["content"]
 
     # 2. read_project_file：安全边界 — 路径逃逸必须被拒绝
     res = await execute_tool(FIXTURE, "read_project_file",
@@ -51,30 +51,30 @@ async def main():
 
     # 3. read_project_file：行范围
     res = await execute_tool(FIXTURE, "read_project_file",
-                             {"file_path": "src/services/story.ts", "start_line": 20, "max_lines": 10})
-    show("read_project_file (story.ts L20-29)", res, ["file", "total_lines", "shown_range", "next_start_line"])
+                             {"file_path": "src/services/ledger.ts", "start_line": 20, "max_lines": 10})
+    show("read_project_file (ledger.ts L20-29)", res, ["file", "total_lines", "shown_range", "next_start_line"])
     assert res["ok"] and res["result"]["truncated"] is True
 
     # 4. search_project：TODO 搜索
     res = await execute_tool(FIXTURE, "search_project", {"query": "TODO"})
     show("search_project (TODO)", res, ["total_matches_shown", "files_with_matches"])
     files = res["result"]["files_with_matches"]
-    assert "src/services/story.ts" in files
-    assert "src/pages/MyWorks.tsx" in files
-    assert "tests/story.test.ts" in files
+    assert "src/services/ledger.ts" in files
+    assert "src/pages/Archive.tsx" in files
+    assert "tests/ledger.test.ts" in files
 
-    # 5. search_project：未引用组件检测（CoverPreview 只在定义处出现）
-    res = await execute_tool(FIXTURE, "search_project", {"query": "CoverPreview"})
-    show("search_project (CoverPreview 引用)", res, ["total_matches_shown", "matches"])
-    assert res["result"]["total_matches_shown"] == 1, "CoverPreview 应只出现 1 次（仅定义，无引用）"
+    # 5. search_project：未引用组件检测（BudgetBadge 只在定义处出现）
+    res = await execute_tool(FIXTURE, "search_project", {"query": "BudgetBadge"})
+    show("search_project (BudgetBadge 引用)", res, ["total_matches_shown", "matches"])
+    assert res["result"]["total_matches_shown"] == 1, "BudgetBadge 应只出现 1 次（仅定义，无引用）"
 
-    # 6. search_project：cover 字段证据
-    res = await execute_tool(FIXTURE, "search_project", {"query": "cover"})
+    # 6. search_project：budget 字段证据
+    res = await execute_tool(FIXTURE, "search_project", {"query": "budget"})
     files = res["result"]["files_with_matches"]
-    print("[cover 出现的文件]", files, "\n")
-    assert "src/types/story.ts" in files and "src/services/story.ts" in files
-    assert "src/pages/CreateStory.tsx" in files  # 注释里提到
-    assert "src/components/CoverPreview.tsx" in files
+    print("[budget 出现的文件]", files, "\n")
+    assert "src/types/ledger.ts" in files and "src/services/ledger.ts" in files
+    assert "src/pages/CreateEntry.tsx" in files  # 注释里提到
+    assert "src/components/BudgetBadge.tsx" in files
 
     # 7. analyze_git_history
     res = await execute_tool(FIXTURE, "analyze_git_history", {})
@@ -83,7 +83,7 @@ async def main():
     assert res["ok"]
     assert res["result"]["total_commits"] == 4
     assert res["result"]["active_recently"] is False
-    assert res["result"]["last_commit"]["message"] == "wip: 编辑器骨架（烂尾于此）"
+    assert res["result"]["last_commit"]["message"] == "wip: 图表页骨架（烂尾于此）"
 
     # 8. run_project_check：deps_check（node_modules 不存在 → 重要证据）
     res = await execute_tool(FIXTURE, "run_project_check", {"check": "deps_check"})

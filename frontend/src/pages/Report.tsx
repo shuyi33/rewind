@@ -55,7 +55,7 @@ export default function Report() {
 
   if (error) {
     return (
-      <main className="page">
+      <main className="page report-dark">
         <div className="banner banner-error">加载报告失败：{error}</div>
         <Link to="/">← 返回首页</Link>
       </main>
@@ -63,7 +63,7 @@ export default function Report() {
   }
   if (!report) {
     return (
-      <main className="page">
+      <main className="page report-dark">
         <p className="muted">正在加载报告…</p>
       </main>
     )
@@ -85,7 +85,7 @@ export default function Report() {
   }
 
   return (
-    <main className="page">
+    <main className="page report-dark">
       {/* ---------- 头部 ---------- */}
       <header style={{ marginBottom: 'var(--space-6)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>

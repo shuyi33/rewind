@@ -1,16 +1,16 @@
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-import CreateStory from './pages/CreateStory'
-import Editor from './pages/Editor'
-import MyWorks from './pages/MyWorks'
+import CreateEntry from './pages/CreateEntry'
+import Charts from './pages/Charts'
+import Archive from './pages/Archive'
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/create" element={<CreateStory />} />
-      <Route path="/editor/:id" element={<Editor />} />
-      <Route path="/works" element={<MyWorks />} />
+      <Route path="/create" element={<CreateEntry />} />
+      <Route path="/charts/:id" element={<Charts />} />
+      <Route path="/archive" element={<Archive />} />
     </Routes>
   )
 }

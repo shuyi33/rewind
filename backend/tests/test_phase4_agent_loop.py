@@ -71,7 +71,7 @@ async def main():
 
     print("\n===== 报告真实性断言 =====")
     assert report["goal_source"] == "readme", "goal 应从 README 提取"
-    assert report["goal"] and "剧情" in report["goal"], "goal 内容应来自 README"
+    assert report["goal"] and "记账" in report["goal"], "goal 内容应来自 README"
 
     statuses = {f["status"] for f in report["findings"]}
     assert "confirmed_incomplete" in statuses, "TODO 证据应产生 confirmed_incomplete"
@@ -79,13 +79,13 @@ async def main():
 
     todo_f = next(f for f in report["findings"] if f["status"] == "confirmed_incomplete")
     ev_files = [e["file"] for e in todo_f["evidence"]]
-    assert any("CreateStory.tsx" in p or "Editor.tsx" in p for p in ev_files), "TODO 证据应指向真实文件"
+    assert any("CreateEntry.tsx" in p or "Charts.tsx" in p for p in ev_files), "TODO 证据应指向真实文件"
 
     # 证据真实性：fixture 里 TODO 的确在这些文件这些行
-    editor = Path(FIXTURE, "src/pages/Editor.tsx").read_text().splitlines()
-    ev = next(e for e in todo_f["evidence"] if "Editor.tsx" in e["file"])
+    charts = Path(FIXTURE, "src/pages/Charts.tsx").read_text().splitlines()
+    ev = next(e for e in todo_f["evidence"] if "Charts.tsx" in e["file"])
     line_no = int(ev["lines"])
-    assert "FIXME" in editor[line_no - 1] or "TODO" in editor[line_no - 1], "行号必须对应真实 TODO"
+    assert "FIXME" in charts[line_no - 1] or "TODO" in charts[line_no - 1], "行号必须对应真实 TODO"
 
     assert len(report["suggestions"]) >= 1
     s1 = report["suggestions"][0]
