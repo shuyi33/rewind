@@ -65,6 +65,15 @@ class _Settings:
 settings = _Settings()
 
 
+def reload_settings() -> None:
+    """从环境变量重读 LLM 配置（设置页保存后热加载，无需重启服务）。"""
+    s = settings
+    s.LLM_BASE_URL = _env_str("LLM_BASE_URL", s.LLM_BASE_URL)
+    s.LLM_API_KEY = _env_str("LLM_API_KEY", s.LLM_API_KEY)
+    s.LLM_MODEL = _env_str("LLM_MODEL", s.LLM_MODEL)
+    s.MOCK_LLM = _env_bool("REWIND_MOCK_LLM")
+
+
 def llm_configured() -> bool:
     """是否具备 LLM 能力（真实 Key 或 Mock 引擎）。"""
     return settings.MOCK_LLM or bool(settings.LLM_API_KEY)

@@ -15,6 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.routes_analysis import router as analysis_router
 from api.routes_projects import router as projects_router
+from api.routes_settings import router as settings_router
 from config import llm_configured, settings
 from models import db
 
@@ -31,6 +32,7 @@ app.add_middleware(
 
 app.include_router(projects_router)
 app.include_router(analysis_router)
+app.include_router(settings_router)
 
 
 @app.get("/api/health")

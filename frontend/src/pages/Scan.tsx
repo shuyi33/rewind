@@ -61,7 +61,6 @@ export default function Scan() {
       <header className="scan-head">
         <div>
           <h1 className="scan-title">
-            <span className="scan-title-dot" aria-hidden="true" />
             {finished ? '回溯完成' : '正在回溯'}
           </h1>
           {scanPath && <p className="scan-path">{scanPath}</p>}

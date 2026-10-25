@@ -31,6 +31,17 @@ export const rewindApi = {
 
   demoProject: () => api<{ path: string; available: boolean }>('/api/projects/demo'),
 
+  getSettings: () =>
+    api<{ base_url: string; model: string; mock: boolean; has_key: boolean; api_key_masked: string }>(
+      '/api/settings',
+    ),
+
+  saveSettings: (body: { base_url?: string; model?: string; api_key?: string; mock?: boolean }) =>
+    api<{ base_url: string; model: string; mock: boolean; has_key: boolean; api_key_masked: string }>(
+      '/api/settings',
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
+
   startAnalysis: (path: string, goal?: string) =>
     api<{ report_id: string; project_id: string }>('/api/analysis', {
       method: 'POST',
