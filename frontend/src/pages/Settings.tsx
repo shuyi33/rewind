@@ -30,6 +30,7 @@ export default function Settings() {
   const [err, setErr] = useState<string | null>(null)
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<{ ok: boolean; detail: string } | null>(null)
+  const [showKey, setShowKey] = useState(false)
 
   useEffect(() => {
     rewindApi
@@ -125,16 +126,39 @@ export default function Settings() {
             API Key
             {apiKey.length > 0 && <span className="settings-keylen">已输入 {apiKey.length} 字符{apiKey.startsWith('sk-or-v1-') ? ' · 格式正确' : ''}</span>}
           </span>
-          <input
-            className="settings-input"
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            onBlur={() => { if (apiKey.trim().length > 10) void testConnection() }}
-            placeholder={state?.has_key ? `${state.api_key_masked} — 留空保持不变` : 'sk-… 粘贴后自动测试连接'}
-            spellCheck={false}
-            autoComplete="off"
-          />
+          <div className="settings-key-row">
+            <input
+              className="settings-input"
+              type={showKey ? 'text' : 'password'}
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              onBlur={() => { if (apiKey.trim().length > 10) void testConnection() }}
+              placeholder={state?.has_key ? `${state.api_key_masked} — 留空保持不变` : 'sk-… 粘贴后自动测试连接'}
+              spellCheck={false}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              className="settings-eye"
+              onClick={() => setShowKey((v) => !v)}
+              aria-label={showKey ? '隐藏 Key' : '显示 Key'}
+              title={showKey ? '隐藏' : '显示明文'}
+            >
+              {showKey ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M9.9 4.24A9.1 9.1 0 0 1 12 4c7 0 10 8 10 8a13.2 13.2 0 0 1-1.67 2.68" />
+                  <path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 8 10 8a9.7 9.7 0 0 0 5.39-1.61" />
+                  <path d="M2 2l20 20" />
+                  <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M2 12s3-8 10-8 10 8 10 8-3 8-10 8-10-8-10-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
+          </div>
         </label>
 
         <label className="settings-field">

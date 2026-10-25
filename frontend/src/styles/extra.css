@@ -834,3 +834,26 @@
   font-size: 11.5px;
   color: #75855f;
 }
+
+.settings-key-row { position: relative; display: flex; }
+
+.settings-key-row .settings-input { padding-right: 46px; }
+
+.settings-eye {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  color: #75855f;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.settings-eye:hover { color: #cfe0b4; }
+.settings-eye svg { width: 100%; height: 100%; }

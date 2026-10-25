@@ -90,6 +90,14 @@ class LLMTestRequest(BaseModel):
     model: str | None = None
 
 
+def _find_bad_char(value: str) -> tuple[int, str] | None:
+    """定位第一个非 ASCII 字符（粘贴混入符号/中文时的友好报错）。"""
+    for i, ch in enumerate(value):
+        if ord(ch) > 127:
+            return i, ch
+    return None
+
+
 @router.post("/test")
 async def test_llm(req: LLMTestRequest):
     """连通性测试：用表单当前值（未填的项回退已保存配置）发一条 1-token 迷你请求。
@@ -100,6 +108,12 @@ async def test_llm(req: LLMTestRequest):
     base = (req.base_url or s.LLM_BASE_URL).strip().rstrip("/")
     key = (req.api_key or "").strip() or s.LLM_API_KEY
     model = (req.model or s.LLM_MODEL).strip()
+    for name, value in (("API Key", key), ("API 地址", base)):
+        bad = _find_bad_char(value)
+        if bad:
+            pos, ch = bad
+            return {"ok": False, "detail": f"{name}的第 {pos + 1} 个字符是「{ch}」——粘贴时混入了符号，"
+                                           f"请清空后重新只复制 Key 本身（仅含字母、数字、连字符）"}
     if not key:
         return {"ok": False, "detail": "没有可用的 API Key"}
     if not base:
@@ -108,6 +122,11 @@ async def test_llm(req: LLMTestRequest):
         return {"ok": False, "detail": "没有模型名"}
 
     from openai import AsyncOpenAI
+
+    # 诊断信息：Key 到达后端时的长度与前缀（不回传内容本身）
+    key_len = len(key)
+    prefix_ok = key.startswith("sk-or-v1-") if "openrouter" in base else key.startswith("sk-")
+    diag = f"（后端收到 {key_len} 字符，前缀{'正确' if prefix_ok else '异常'}）"
 
     try:
         client = AsyncOpenAI(base_url=base, api_key=key, timeout=20)
@@ -123,7 +142,12 @@ async def test_llm(req: LLMTestRequest):
         # OpenRouter 对无效/不完整 Key 报 "Missing Authentication header"，极具误导性
         if "401" in msg or "Authentication" in msg or "User not found" in msg:
             if "openrouter" in base:
-                return {"ok": False, "detail": "Key 无效或复制不完整 —— OpenRouter 的 Key 以 sk-or-v1- 开头、约 70+ 字符；"
-                                               "且只在创建时完整显示一次，若当时没保存请到 openrouter.ai/keys 重新生成"}
-            return {"ok": False, "detail": "Key 无效或未授权（401）——请检查 Key 是否复制完整、是否属于该服务商"}
-        return {"ok": False, "detail": f"连接失败：{msg}"}
+                if key_len >= 60 and prefix_ok:
+                    return {"ok": False, "detail": f"Key 已完整送达后端{diag}，但被 OpenRouter 拒绝 —— "
+                                   "这不再是复制问题，请依次检查：① openrouter.ai 账户邮箱是否已验证；"
+                                   "② Keys 页面里这个 Key 的状态是否为 Active（未吊销/未删除）；"
+                                   "③ 账户余额是否可用（deepseek/deepseek-chat 需要充值额度）"}
+                return {"ok": False, "detail": f"Key 未完整到达后端{diag} —— OpenRouter 的 Key 约 70+ 字符、"
+                                               "以 sk-or-v1- 开头；请点输入框右侧「眼睛」核对明文后再测一次"}
+            return {"ok": False, "detail": f"Key 无效或未授权（401）{diag} —— 请检查 Key 是否属于该服务商"}
+        return {"ok": False, "detail": f"连接失败{diag}：{msg}"}
