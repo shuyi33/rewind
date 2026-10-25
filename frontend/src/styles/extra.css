@@ -216,7 +216,7 @@
   width: 100%;
   padding: 6px 6px 6px 20px;
   border-radius: 999px;
-  background: rgba(243, 240, 227, 0.97);
+  background: rgba(242, 243, 239, 0.97);
   border: 1px solid rgba(52, 70, 34, 0.22);
   box-shadow: 0 22px 54px rgba(3, 7, 1, 0.6), 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 0 0 1px rgba(255, 255, 255, 0.25) inset;
   transition: border-color 0.3s, box-shadow 0.3s;
@@ -252,24 +252,64 @@
 
 .search-go {
   flex: none;
+  position: relative;
+  overflow: hidden;
   font-family: inherit;
   font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  color: #f2f0e2;
-  background: linear-gradient(180deg, #3c5423, #2b3d16);
-  border: none;
+  letter-spacing: 0.08em;
+  color: #f0f2ec;
+  background: linear-gradient(180deg, #4a554b, #303a31 55%, #262f28);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
-  padding: 10px 24px;
+  padding: 9px 24px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(24, 36, 11, 0.4), inset 0 1px 0 rgba(211, 229, 173, 0.25);
-  transition: box-shadow 0.25s, transform 0.25s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.28),
+    0 4px 16px rgba(10, 15, 8, 0.4);
+  transition: box-shadow 0.25s, transform 0.15s;
 }
 
-.search-go:hover:not(:disabled) {
-  box-shadow: 0 6px 24px rgba(24, 36, 11, 0.55), inset 0 1px 0 rgba(211, 229, 173, 0.3);
-  transform: translateY(-1px);
+/* 液态金属的色散描边 */
+.search-go::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(115deg, rgba(255, 130, 120, 0.5), rgba(255, 220, 130, 0.32), rgba(130, 255, 200, 0.42), rgba(130, 185, 255, 0.5));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
 }
+
+/* hover 流光扫过 */
+.search-go::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -70%;
+  width: 45%;
+  height: 140%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+
+.search-go:hover:not(:disabled)::after { left: 125%; }
+
+.search-go:hover:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.3),
+    0 6px 22px rgba(10, 15, 8, 0.5);
+}
+
+.search-go:active:not(:disabled) { transform: translateY(1px) scale(0.98); }
 
 .search-go:disabled { opacity: 0.6; cursor: wait; }
 
