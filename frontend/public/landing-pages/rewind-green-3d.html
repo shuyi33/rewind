@@ -710,6 +710,28 @@
     .ghost{ font-size:calc(184 * var(--u)); letter-spacing:calc(14 * var(--u)); bottom:calc(660 * var(--u)); left:calc(-10 * var(--u)); }
   }
 </style>
+<style>
+/* ===== Rewind 场景内功能卡（沿用上游卡片视觉语言） ===== */
+.card--about{ display:flex; flex-direction:column; height:auto; min-height:calc(305 * var(--u)); padding:calc(36 * var(--u)) calc(30 * var(--u)) calc(28 * var(--u)); }
+.card--about .label, .card--about h2{ position:static; width:auto; left:auto; top:auto; }
+.card--about h2{ margin:calc(8 * var(--u)) 0 calc(20 * var(--u)); }
+.rw-input{ width:100%; font:inherit; font-size:calc(15 * var(--u)); color:#eef3e6; background:rgba(9,13,6,.55); border:1px solid rgba(122,142,92,.35); border-radius:calc(16 * var(--u)); padding:calc(14 * var(--u)) calc(16 * var(--u)); outline:none; }
+.rw-input:focus{ border-color:rgba(183,217,138,.6); box-shadow:0 0 0 calc(6 * var(--u)) rgba(183,217,138,.08); }
+.rw-input::placeholder{ color:rgba(190,200,170,.38); }
+.rw-cta{ display:flex; margin-top:calc(18 * var(--u)); }
+.liquid-stage--rewind{ --h:calc(54 * var(--u)); }
+.liquid-button--rewind{ width:calc(196 * var(--u)); font-size:calc(15 * var(--u)); letter-spacing:.08em; }
+.rw-recent{ margin-top:calc(18 * var(--u)); display:flex; flex-direction:column; gap:calc(6 * var(--u)); }
+.rw-cap{ font-size:calc(12 * var(--u)); letter-spacing:.18em; color:rgba(190,200,170,.5); margin:0 0 calc(4 * var(--u)); }
+.rw-proj{ display:flex; align-items:center; gap:calc(10 * var(--u)); font:inherit; font-size:calc(13.5 * var(--u)); color:#e4ecd6; background:none; border:none; border-radius:calc(10 * var(--u)); padding:calc(7 * var(--u)) calc(10 * var(--u)); cursor:pointer; text-align:left; min-width:0; }
+.rw-proj:hover{ background:rgba(183,217,138,.07); }
+.rw-proj span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rw-dot{ flex:none; width:calc(8 * var(--u)); height:calc(8 * var(--u)); border-radius:50%; background:rgba(190,200,170,.4); }
+.rw-dot[data-s='completed']{ background:#9dc36a; box-shadow:0 0 calc(8 * var(--u)) rgba(157,195,106,.6); }
+.rw-dot[data-s='failed']{ background:#e08a75; }
+.rw-dot[data-s='running']{ background:#d9c874; }
+.rw-hint{ margin:calc(12 * var(--u)) 0 0; font-size:calc(12 * var(--u)); line-height:1.5; color:#cbb98a; }
+</style>
 </head>
 <body>
 
@@ -762,26 +784,25 @@
     <div class="ghost fade" style="--d:1150ms" aria-hidden="true">REWIND</div>
 
     <!-- card 1 sits *behind* the canvas so the moss drapes over its shoulder -->
-    <article class="card card--about mask" style="--d:760ms; --pd:10; --pr:2.2">
-      <figure class="portal" data-delay="920">
-        <span class="portal-media"><img src="inner-green-assets/card-ethos.jpg" alt="A cushion of moss grown over lichen-crusted stones" loading="eager" decoding="async"></span>
-        <canvas class="pixel-reveal" aria-hidden="true"></canvas>
-      </figure>
-      <p class="label">设计原则</p>
-      <h2>不假装知道。</h2>
+    <article class="card card--about rw-card mask" style="--d:760ms; --pd:10; --pr:2.2">
+      <p class="label">Rewind · 回溯</p>
+      <h2>从一条路径开始</h2>
+      <input id="rw-path" class="rw-input" type="text" placeholder="D:\Projects\story-tree" spellcheck="false" autocomplete="off" enterkeyhint="go" aria-label="项目文件夹路径">
+      <div class="rw-cta">
+        <div class="liquid-stage liquid-stage--rewind" data-liquid-metal="rewind">
+          <div class="liquid-plate plate" aria-hidden="true"></div>
+          <canvas class="liquid-fx" aria-hidden="true"></canvas>
+          <button class="liquid-button liquid-button--rewind btn" type="button" id="rw-go"><span class="lbl">开始回溯</span></button>
+        </div>
+      </div>
+      <div class="rw-recent" id="rw-recent"></div>
+      <p class="rw-hint" id="rw-hint" hidden></p>
     </article>
 
     <!-- the About knob rides *outside* the card: the card has to stay a plain
          painted box under #scene, so anything that must sit in front of the
          moss lives here instead, sharing the card's parallax origin -->
-    <span class="knob-float" style="--pd:10; --pr:2.2">
-      <button class="knob knob--about mask-circle" style="--d:1100ms" aria-label="Read about Sylva">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 21v-7"/><path d="M12 14c0-3.3 2.4-6 5.5-6 .3 3.6-2.2 6.4-5.5 6Z"/>
-          <path d="M12 16c-.1-2.9-2.2-5.2-4.9-5.2C6.8 13.7 9 16 12 16Z"/>
-        </svg>
-      </button>
-    </span>
+    
 
     <h1 class="headline" style="--pd:18; --pr:1.2">
       <span><i style="--d:260ms">把烂尾的项目，</i></span>
@@ -870,6 +891,10 @@
   </div>
 </main>
 
+<script>
+/* Rewind 性能补丁：高分屏 devicePixelRatio 上限 1.5，降低 shader 像素压力（不改上游场景逻辑） */
+(function(){ try{ var native = window.devicePixelRatio || 1; if(native > 1.5){ Object.defineProperty(window, 'devicePixelRatio', { get: function(){ return 1.5; }, configurable: true }); } }catch(e){} })();
+</script>
 <script src="inner-green-assets/three.min.js"></script>
 <script>
 (function () {
@@ -4302,12 +4327,35 @@ window.__seek   = v => { clock = v; drawn = null; };
 </script>
 
 <script>
-/* Rewind 集成桥接：hero 内的行动按钮通知宿主页面（不改动上游脚本） */
+/* Rewind 集成桥接 v2：功能卡与宿主页面的通信（不改动上游脚本） */
 (function(){
-  function ping(){ try{ parent.postMessage({type:'rewind:enter'}, '*'); }catch(e){} }
-  document.querySelectorAll('.liquid-button--explore, .dock-item--enter').forEach(function(el){
-    el.addEventListener('click', ping);
+  var pathInput = document.getElementById('rw-path');
+  var recentBox = document.getElementById('rw-recent');
+  var hint = document.getElementById('rw-hint');
+  function send(msg){ try{ parent.postMessage(msg, '*'); }catch(e){} }
+  function submit(){ var v = (pathInput.value || '').trim(); if(v) send({ type:'rewind:submit', path: v }); }
+  document.getElementById('rw-go').addEventListener('click', submit);
+  pathInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); submit(); } });
+  window.addEventListener('message', function(e){
+    var d = e.data || {};
+    if(d.type !== 'rewind:ctx') return;
+    if(d.projects && d.projects.length){
+      recentBox.textContent = '';
+      var cap = document.createElement('p'); cap.className = 'rw-cap'; cap.textContent = '最近回溯';
+      recentBox.appendChild(cap);
+      d.projects.slice(0, 3).forEach(function(p){
+        var b = document.createElement('button');
+        b.className = 'rw-proj';
+        var dot = document.createElement('i'); dot.className = 'rw-dot'; dot.dataset.s = p.status || 'none';
+        var name = document.createElement('span'); name.textContent = p.name;
+        b.appendChild(dot); b.appendChild(name);
+        b.addEventListener('click', function(){ send({ type:'rewind:open', path: p.path }); });
+        recentBox.appendChild(b);
+      });
+    }
+    if(d.hint){ hint.textContent = d.hint; hint.hidden = false; } else { hint.hidden = true; }
   });
+  send({ type:'rewind:ready' });
 })();
 </script>
 </body>
