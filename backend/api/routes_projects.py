@@ -1,4 +1,6 @@
-"""项目相关路由：路径校验 + 最近项目列表。"""
+"""项目相关路由：路径校验 + 最近项目列表 + 内置样例。"""
+
+from pathlib import Path
 
 from fastapi import APIRouter
 
@@ -17,3 +19,10 @@ def validate(req: ValidatePathRequest):
 @router.get("")
 def list_projects():
     return {"projects": db.list_projects()}
+
+
+@router.get("/demo")
+def demo_project():
+    """内置烂尾样例（story-tree）的绝对路径，供首页「诊断样例」卡片直连扫描。"""
+    fixture = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "story-tree"
+    return {"path": str(fixture), "available": fixture.is_dir()}

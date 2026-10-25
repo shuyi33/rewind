@@ -710,6 +710,11 @@
     .ghost{ font-size:calc(184 * var(--u)); letter-spacing:calc(14 * var(--u)); bottom:calc(660 * var(--u)); left:calc(-10 * var(--u)); }
   }
 </style>
+<style>
+/* Rewind：诊断样例卡可点击 */
+.card--stove{ cursor:pointer; transition: box-shadow .8s var(--ease, ease), filter .35s ease; }
+.card--stove:hover{ filter: brightness(1.07) saturate(1.06); }
+</style>
 </head>
 <body>
 
@@ -4291,12 +4296,14 @@ window.__seek   = v => { clock = v; drawn = null; };
 </script>
 
 <script>
-/* Rewind 桥接 v3：场景大按钮通知宿主聚焦搜索栏（不改动上游脚本） */
+/* Rewind 桥接 v4：场景大按钮聚焦搜索栏；诊断样例卡直连回溯（不改动上游脚本） */
 (function(){
   function send(msg){ try{ parent.postMessage(msg, '*'); }catch(e){} }
   document.querySelectorAll('.liquid-button--explore, .dock-item--enter').forEach(function(el){
     el.addEventListener('click', function(){ send({ type: 'rewind:focus' }); });
   });
+  var stove = document.querySelector('.card--stove');
+  if(stove){ stove.addEventListener('click', function(){ send({ type: 'rewind:demo' }); }); }
 })();
 </script>
 </body>

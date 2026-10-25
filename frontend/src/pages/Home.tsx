@@ -28,9 +28,16 @@ export default function Home() {
       .catch(() => {})
 
     const onMsg = (e: MessageEvent) => {
-      if ((e.data as { type?: string })?.type === 'rewind:focus') {
+      const t = (e.data as { type?: string })?.type
+      if (t === 'rewind:focus') {
         inputRef.current?.focus()
         inputRef.current?.select()
+      } else if (t === 'rewind:demo') {
+        // 场景里「诊断样例 · Story Tree」卡片 → 直接回溯内置样例
+        rewindApi
+          .demoProject()
+          .then((d) => { if (d.available) void start(d.path) })
+          .catch(() => setError('样例项目不可用'))
       }
     }
     window.addEventListener('message', onMsg)

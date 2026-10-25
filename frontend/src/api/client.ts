@@ -29,6 +29,8 @@ export const rewindApi = {
 
   listProjects: () => api<{ projects: ProjectInfo[] }>('/api/projects'),
 
+  demoProject: () => api<{ path: string; available: boolean }>('/api/projects/demo'),
+
   startAnalysis: (path: string, goal?: string) =>
     api<{ report_id: string; project_id: string }>('/api/analysis', {
       method: 'POST',
