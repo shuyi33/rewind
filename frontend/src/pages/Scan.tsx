@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { subscribeEvents } from '../api/client'
 import type { AgentEvent } from '../types'
 import { PhaseProgress } from '../components/PhaseProgress'
 import { ToolLog, type LogEntry } from '../components/ToolLog'
+import { DiagnosisTree, aggregateNodes } from '../components/DiagnosisTree'
 
-/** 扫描页：订阅 SSE 事件流，展示真实阶段与 Agent 的每一步工具调用。 */
+/** 扫描页：订阅 SSE，把 Agent 的每一步取证长成一棵「证据之树」。 */
 export default function Scan() {
   const { reportId } = useParams()
   const navigate = useNavigate()
@@ -45,7 +46,7 @@ export default function Scan() {
             setFinished(true)
             if (ev.status === 'completed' && !navigated.current) {
               navigated.current = true
-              setTimeout(() => navigate(`/report/${reportId}`, { replace: true }), 500)
+              setTimeout(() => navigate(`/report/${reportId}`, { replace: true }), 1400)
             }
             break
         }
@@ -55,33 +56,39 @@ export default function Scan() {
     return cleanup
   }, [reportId, navigate])
 
-  return (
-    <main className="page">
-      <div style={{ marginBottom: 'var(--space-5)' }}>
-        <h1 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, margin: 0 }}>
-          {finished ? '回溯完成' : '正在回溯…'}
-        </h1>
-        {scanPath ? <p className="mono-sm subtle" style={{ margin: 'var(--space-1) 0 0' }}>{scanPath}</p> : null}
-      </div>
+  const nodes = useMemo(() => aggregateNodes(entries), [entries])
+  const rootName = scanPath ? scanPath.split(/[\\/]/).filter(Boolean).pop() ?? '项目' : '项目'
 
-      <div className="scan-layout">
-        <PhaseProgress current={finished ? 'finished' : phase} />
+  return (
+    <main className="scan-page">
+      <header className="scan-head">
         <div>
-          {error ? (
-            <div className="banner banner-error" role="alert">
-              分析失败：{error}
-              <div style={{ marginTop: 'var(--space-2)' }}>
-                <Link to="/">← 返回首页重新开始</Link>
-              </div>
-            </div>
-          ) : (
-            <ToolLog entries={entries} />
-          )}
-          {finished && !error ? (
-            <p className="muted" style={{ marginTop: 'var(--space-3)' }}>正在打开诊断报告…</p>
-          ) : null}
+          <h1 className="scan-title">
+            <span className="scan-title-dot" aria-hidden="true" />
+            {finished ? '回溯完成' : '正在回溯'}
+          </h1>
+          {scanPath && <p className="scan-path">{scanPath}</p>}
         </div>
-      </div>
+        <PhaseProgress current={finished ? 'finished' : phase} />
+      </header>
+
+      {error ? (
+        <div className="scan-error" role="alert">
+          分析失败：{error}
+          <div className="scan-error-back">
+            <Link to="/">← 返回重新开始</Link>
+          </div>
+        </div>
+      ) : (
+        <DiagnosisTree nodes={nodes} rootName={rootName} rootPath={scanPath ?? ''} finished={finished} />
+      )}
+
+      {finished && !error && <p className="scan-done">证据已收齐，正在打开诊断报告…</p>}
+
+      <details className="scan-raw">
+        <summary>原始事件日志</summary>
+        <ToolLog entries={entries} />
+      </details>
     </main>
   )
 }
