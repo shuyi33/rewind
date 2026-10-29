@@ -19,6 +19,8 @@ export default function Home() {
   const [hint, setHint] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const frameRef = useRef<HTMLIFrameElement>(null)
+  const langRef = useRef(lang)
+  langRef.current = lang
 
   useEffect(() => {
     rewindApi.listProjects().then((r) => setProjects(r.projects)).catch(() => {})
@@ -44,6 +46,21 @@ export default function Home() {
 
     const onMsg = (e: MessageEvent) => {
       const d = e.data as { type?: string; to?: string }
+      if (d?.type === 'rewind:ready') {
+        // 场景就绪握手：补发语言与统计，消除加载竞态
+        frameRef.current?.contentWindow?.postMessage({ type: 'rewind:lang', lang: langRef.current }, '*')
+        rewindApi
+          .demoProject()
+          .then((r) => {
+            if (r.available)
+              frameRef.current?.contentWindow?.postMessage(
+                { type: 'rewind:stats', days: r.last_commit_days, todo: r.todo_count },
+                '*',
+              )
+          })
+          .catch(() => {})
+        return
+      }
       if (d?.type === 'rewind:focus') {
         inputRef.current?.focus()
         inputRef.current?.select()

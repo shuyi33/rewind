@@ -4331,6 +4331,7 @@ window.__seek   = v => { clock = v; drawn = null; };
       renderStats();
     }
   });
+  send({ type: 'rewind:ready' });
 })();
 </script>
 </body>
