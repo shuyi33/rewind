@@ -4259,6 +4259,14 @@ window.__seek   = v => { clock = v; drawn = null; };
 })();
 </script>
 
+<style>
+/* Rewind：英文排版适配（中文栏位较窄，英文文本更长需要更宽的空间） */
+@media (min-width:901px){
+  body.lang-en .headline{ font-size:calc(50 * var(--u)); line-height:calc(56 * var(--u)); }
+  body.lang-en .lede{ left:calc(560 * var(--u)); top:calc(190 * var(--u)); width:calc(440 * var(--u)); font-size:calc(14.5 * var(--u)); line-height:calc(20.5 * var(--u)); }
+  body.lang-en .card--stove .label{ font-size:calc(0.82 * 1em); }
+}
+</style>
 <script>
 /* Rewind 桥接 v6：dock 导航 / 聚焦 / 样例卡 / 统计同步 / 双语切换（不改动上游脚本） */
 (function(){
@@ -4287,6 +4295,7 @@ window.__seek   = v => { clock = v; drawn = null; };
 
   function send(msg){ try{ parent.postMessage(msg, '*'); }catch(e){} }
   function applyLang(){
+    document.body.classList.toggle('lang-en', LANG === 'en');
     var d = LANG === 'en' ? EN : ZH;
     document.querySelectorAll('[data-rw-i18n]').forEach(function(el){
       var k = el.getAttribute('data-rw-i18n');
