@@ -11,7 +11,7 @@ import json
 
 from agent.heuristic import build_heuristic_report
 from agent.llm import get_llm
-from agent.prompts import SYSTEM_PROMPT, user_brief
+from agent.prompts import system_prompt, user_brief
 from agent.tool_summary import summarize_tool
 from config import settings
 from models.schemas import Evidence, Finding, ProjectMap, Suggestion
@@ -82,21 +82,22 @@ def validate_report(data: dict) -> tuple[ReportCore | None, str | None]:
 
 
 class AgentRunner:
-    def __init__(self, project_root: str, goal: str | None, on_event):
+    def __init__(self, project_root: str, goal: str | None, on_event, lang: str = "zh"):
         self.root = project_root
         self.goal = goal
         self.on_event = on_event
+        self.lang = lang
         self.trace: list[dict] = []
 
     def emit(self, event: dict) -> None:
         self.on_event(event)
 
     async def run(self) -> dict:
-        llm = get_llm()
+        llm = get_llm(self.lang)
         specs = tool_specs()
         messages: list[dict] = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_brief(self.root, self.goal, last_analyzed=False)},
+            {"role": "system", "content": system_prompt(self.lang)},
+            {"role": "user", "content": user_brief(self.root, self.goal, last_analyzed=False, lang=self.lang)},
         ]
 
         report_core: ReportCore | None = None
@@ -137,7 +138,7 @@ class AgentRunner:
                     self.emit({"type": "tool_call", "step": step, "tool": name,
                                "args": args, "phase": phase})
                     outcome = await execute_tool(self.root, name, args)
-                    summary = summarize_tool(name, outcome)
+                    summary = summarize_tool(name, outcome, self.lang)
                     self.emit({"type": "tool_result", "step": step, "tool": name,
                                "ok": bool(outcome["ok"]), "summary": summary,
                                "duration_ms": outcome["duration_ms"]})
@@ -182,7 +183,7 @@ class AgentRunner:
                                          "result": json.loads(m["content"])})
                         except (json.JSONDecodeError, TypeError):
                             pass
-                data = build_heuristic_report(real or collected, self.root)
+                data = build_heuristic_report(real or collected, self.root, self.lang)
                 data["generated_by"] = "heuristic_fallback"
                 report_core, _ = validate_report(data)
             if report_core is None:
@@ -200,6 +201,6 @@ class AgentRunner:
         }
 
 
-async def run_diagnosis(project_root: str, goal: str | None, on_event) -> dict:
-    runner = AgentRunner(project_root, goal, on_event)
+async def run_diagnosis(project_root: str, goal: str | None, on_event, lang: str = "zh") -> dict:
+    runner = AgentRunner(project_root, goal, on_event, lang)
     return await runner.run()

@@ -53,6 +53,7 @@ class Suggestion(BaseModel):
 class StartAnalysisRequest(BaseModel):
     path: str
     goal: str | None = None
+    lang: str = "zh"
 
 
 class StartAnalysisResponse(BaseModel):

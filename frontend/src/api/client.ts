@@ -51,10 +51,10 @@ export const rewindApi = {
       { method: 'POST', body: JSON.stringify(body) },
     ),
 
-  startAnalysis: (path: string, goal?: string) =>
+  startAnalysis: (path: string, goal?: string, lang?: string) =>
     api<{ report_id: string; project_id: string }>('/api/analysis', {
       method: 'POST',
-      body: JSON.stringify({ path, goal }),
+      body: JSON.stringify({ path, goal, lang }),
     }),
 
   getReport: (reportId: string) => api<{ report: ReportRecord }>(`/api/reports/${reportId}`),

@@ -1,20 +1,23 @@
-/** 扫描阶段进度（真实阶段，非假百分比）。 */
+/** 扫描阶段进度（真实阶段，非假百分比）。标签跟随界面语言。 */
+
+import { useI18n } from '../i18n'
 
 export const PHASE_ORDER = [
-  { key: 'detect', label: '正在识别项目类型' },
-  { key: 'structure', label: '正在分析文件结构' },
-  { key: 'git', label: '正在检查 Git 历史' },
-  { key: 'evidence', label: '正在寻找未完成内容' },
-  { key: 'check', label: '正在运行项目检查' },
-  { key: 'final', label: '正在建立项目状态' },
+  { key: 'detect', i18n: 'phase.detect' },
+  { key: 'structure', i18n: 'phase.structure' },
+  { key: 'git', i18n: 'phase.git' },
+  { key: 'evidence', i18n: 'phase.evidence' },
+  { key: 'check', i18n: 'phase.check' },
+  { key: 'final', i18n: 'phase.report' },
 ] as const
 
 type PhaseState = 'pending' | 'active' | 'done'
 
 export function PhaseProgress({ current }: { current: string | null }) {
+  const { t } = useI18n()
   const idx = PHASE_ORDER.findIndex((p) => p.key === current)
   return (
-    <div className="phase-list" role="list" aria-label="分析进度">
+    <div className="phase-list" role="list" aria-label={t('report.status')}>
       {PHASE_ORDER.map((p, i) => {
         let state: PhaseState = 'pending'
         if (idx >= 0) {
@@ -31,12 +34,12 @@ export function PhaseProgress({ current }: { current: string | null }) {
                   <path d="M3 8.5l3.5 3.5L13 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               ) : state === 'active' ? (
-                <span className="spinner" aria-label="进行中" />
+                <span className="spinner" aria-label="..." />
               ) : (
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--border)' }} />
               )}
             </span>
-            <span>{p.label}</span>
+            <span>{t(p.i18n)}</span>
           </div>
         )
       })}

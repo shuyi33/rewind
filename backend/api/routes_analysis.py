@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api", tags=["analysis"])
 async def start_analysis(req: StartAnalysisRequest):
     from services.analysis_service import start_analysis
 
-    return await start_analysis(req.path, req.goal)
+    return await start_analysis(req.path, req.goal, req.lang)
 
 
 @router.get("/analysis/{report_id}/events")

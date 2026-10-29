@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { rewindApi } from '../api/client'
+import { useI18n } from '../i18n'
 import type { ProjectInfo, ValidateResult } from '../types'
 
 /**
@@ -10,6 +11,7 @@ import type { ProjectInfo, ValidateResult } from '../types'
  */
 export default function Home() {
   const navigate = useNavigate()
+  const { t, lang, setLang } = useI18n()
   const [path, setPath] = useState('')
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -23,8 +25,8 @@ export default function Home() {
     rewindApi
       .health()
       .then((h) => {
-        if (!h.llm_configured) setHint('LLM 未配置：在 backend/.env 填入 LLM_API_KEY，或设 REWIND_MOCK_LLM=1')
-        else if (h.mock) setHint('Mock 引擎运行中 — 流程完整，判断为演示级别')
+        if (!h.llm_configured) setHint(t('home.hintNoLLM'))
+        else if (h.mock) setHint(t('home.hintMock'))
       })
       .catch(() => {})
 
@@ -50,7 +52,7 @@ export default function Home() {
         rewindApi
           .demoProject()
           .then((r) => { if (r.available) void start(r.path) })
-          .catch(() => setError('样例项目不可用'))
+          .catch(() => setError(t('home.errDemo')))
       } else if (d?.type === 'rewind:nav') {
         // 场景顶部 dock 横幅：诊断 / 证据 / 报告
         if (d.to === 'home') {
@@ -71,11 +73,16 @@ export default function Home() {
     return () => window.removeEventListener('message', onMsg)
   }, [projects])
 
+  // 语言切换 → 通知场景换文案
+  useEffect(() => {
+    frameRef.current?.contentWindow?.postMessage({ type: 'rewind:lang', lang }, '*')
+  }, [lang])
+
   async function start(raw?: string) {
     const target = (raw ?? path).trim()
     setError(null)
     if (!target) {
-      setError('请输入项目文件夹的本地路径')
+      setError(t('home.errEmptyPath'))
       inputRef.current?.focus()
       return
     }
@@ -85,21 +92,22 @@ export default function Home() {
       v = await rewindApi.validatePath(target)
     } catch (e) {
       setChecking(false)
-      setError(e instanceof Error ? e.message : '路径校验失败')
+      setError(e instanceof Error ? e.message : t('home.errValidate'))
       return
     }
     if (!v.valid) {
       setChecking(false)
-      setError(v.error ?? '路径不可用')
+      setError(v.error ?? t('home.errValidate'))
       return
     }
     try {
-      const { report_id } = await rewindApi.startAnalysis(v.path)
+      const { report_id } = await rewindApi.startAnalysis(v.path, undefined, lang)
       sessionStorage.setItem('rewind:scan-path', v.path)
+      sessionStorage.setItem('rewind:lang', lang)
       navigate(`/scan/${report_id}`)
     } catch (e) {
       setChecking(false)
-      setError(e instanceof Error ? e.message : '无法开始分析')
+      setError(e instanceof Error ? e.message : t('home.errStart'))
     }
   }
 
@@ -112,26 +120,28 @@ export default function Home() {
     } else {
       setChecking(true)
       try {
-        const { report_id } = await rewindApi.startAnalysis(p.path)
+        const { report_id } = await rewindApi.startAnalysis(p.path, undefined, lang)
         sessionStorage.setItem('rewind:scan-path', p.path)
+        sessionStorage.setItem('rewind:lang', lang)
         navigate(`/scan/${report_id}`)
       } catch (e) {
         setChecking(false)
-        setError(e instanceof Error ? e.message : '无法开始分析')
+        setError(e instanceof Error ? e.message : t('home.errStart'))
       }
     }
   }
 
   return (
     <main className="sylva-home">
-      <section className="sylva-hero" aria-label="Rewind · 回溯">
+      <section className="sylva-hero" aria-label="Rewind">
         <iframe
           ref={frameRef}
           src="/landing-pages/rewind-green-3d.html"
-          title="Rewind · 回溯 — 把烂尾的项目重新看清楚"
+          title="Rewind"
           sandbox="allow-downloads allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
           loading="eager"
           onLoad={() => {
+            frameRef.current?.contentWindow?.postMessage({ type: 'rewind:lang', lang }, '*')
             rewindApi
               .demoProject()
               .then((d) => {
@@ -146,9 +156,9 @@ export default function Home() {
         />
       </section>
 
-      <div className="search-deck" aria-label="回溯入口">
+      <div className="search-deck" aria-label="Rewind">
         <div className="search-bar">
-          <button className="search-gear" onClick={() => navigate('/settings')} aria-label="设置" title="设置（LLM 配置）">
+          <button className="search-gear" onClick={() => navigate('/settings')} aria-label={t('home.settings')} title={t('home.settings')}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="3.2" />
               <path d="M19.1 14.6a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1.03 1.56h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.56 1.03z" />
@@ -157,21 +167,25 @@ export default function Home() {
           <input
             ref={inputRef}
             className="search-input"
-            placeholder="输入项目的本地路径，例如 D:\Projects\pocket-ledger"
+            placeholder={t('home.searchPlaceholder')}
             value={path}
             onChange={(e) => setPath(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !checking && start()}
             spellCheck={false}
             autoComplete="off"
-            aria-label="项目文件夹路径"
+            aria-label={t('home.searchAria')}
           />
           <button className="search-go" onClick={() => start()} disabled={checking}>
-            {checking ? '正在检查…' : '回溯'}
+            {checking ? t('home.checking') : t('home.go')}
           </button>
         </div>
 
+        <button className="lang-toggle" onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')} title={t('lang.switchTo')}>
+          {t('lang.toggle')}
+        </button>
+
         {projects.length > 0 && (
-          <div className="search-recent" aria-label="最近回溯">
+          <div className="search-recent" aria-label={t('home.recent')}>
             {projects.filter((p) => !p.path.includes('fixtures')).slice(0, 3).map((p) => (
               <button key={p.id} className="recent-chip" onClick={() => openRecent(p)}>
                 <i

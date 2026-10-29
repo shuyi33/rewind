@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { rewindApi } from '../api/client'
+import { useI18n } from '../i18n'
 
 type SettingsState = {
   base_url: string
@@ -15,11 +16,12 @@ const PRESETS = [
   { name: 'DeepSeek', url: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
   { name: '智谱 GLM', url: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4.5' },
   { name: 'OpenAI', url: 'https://api.openai.com/v1', model: 'gpt-4o' },
-  { name: 'Ollama 本地', url: 'http://127.0.0.1:11434/v1', model: 'qwen2.5:14b' },
+  { name: 'Ollama', url: 'http://127.0.0.1:11434/v1', model: 'qwen2.5:14b' },
 ]
 
 /** 设置页：LLM 配置（写入 backend/.env，保存后热加载，无需重启服务）。 */
 export default function Settings() {
+  const { t, lang, setLang } = useI18n()
   const [baseUrl, setBaseUrl] = useState('')
   const [model, setModel] = useState('')
   const [apiKey, setApiKey] = useState('')
@@ -41,7 +43,7 @@ export default function Settings() {
         setModel(s.model)
         setMock(s.mock)
       })
-      .catch(() => setErr('无法加载设置'))
+      .catch(() => setErr(t('settings.loadFail')))
   }, [])
 
   async function testConnection() {
@@ -50,8 +52,8 @@ export default function Settings() {
     try {
       const r = await rewindApi.testLLM({ base_url: baseUrl, api_key: apiKey || undefined, model })
       setTestResult(r)
-    } catch (e) {
-      setTestResult({ ok: false, detail: e instanceof Error ? e.message : '测试请求失败' })
+    } catch {
+      setTestResult({ ok: false, detail: t('settings.testFail') })
     } finally {
       setTesting(false)
     }
@@ -71,37 +73,45 @@ export default function Settings() {
       setState(s)
       setMock(s.mock)
       setApiKey('')
-      setMsg('已保存并即时生效')
+      setMsg(t('settings.saved'))
     } catch (e) {
-      setErr(e instanceof Error ? e.message : '保存失败')
+      setErr(e instanceof Error ? e.message : t('settings.saveFail'))
     } finally {
       setSaving(false)
     }
   }
 
+  const badge = state ? (state.mock ? 'is-mock' : state.has_key ? 'is-live' : 'is-none') : ''
+  const badgeText = state
+    ? state.mock
+      ? t('settings.badgeMock')
+      : state.has_key
+        ? t('settings.badgeLive')
+        : t('settings.badgeNone')
+    : '…'
+  const subText = state
+    ? state.mock
+      ? t('settings.mockSub')
+      : state.has_key
+        ? `${t('settings.liveSub')} ${state.api_key_masked} · ${state.model}`
+        : t('settings.noneSub')
+    : ''
+
   return (
     <main className="settings-page">
       <header className="settings-head">
-        <h1>设置</h1>
-        <Link to="/" className="settings-back">← 返回首页</Link>
+        <h1>{t('settings.title')}</h1>
+        <Link to="/" className="settings-back">{t('settings.back')}</Link>
       </header>
 
       <section className="settings-card">
         <div className="settings-status">
-          <span className={`settings-badge${state ? (state.mock ? ' is-mock' : state.has_key ? ' is-live' : ' is-none') : ''}`}>
-            {state ? (state.mock ? 'Mock 引擎' : state.has_key ? '真实 LLM 已配置' : '未配置') : '…'}
-          </span>
-          <span className="settings-sub">
-            {state?.mock
-              ? '流程完整，判断为演示级别'
-              : state?.has_key
-                ? `密钥 ${state.api_key_masked} · ${state.model}`
-                : '填入 API Key 后即可智能诊断'}
-          </span>
+          <span className={`settings-badge${badge ? ` ${badge}` : ''}`}>{badgeText}</span>
+          <span className="settings-sub">{subText}</span>
         </div>
 
         <label className="settings-field">
-          <span className="settings-label">服务预置</span>
+          <span className="settings-label">{t('settings.provider')}</span>
           <div className="settings-presets">
             {PRESETS.map((p) => (
               <button
@@ -117,14 +127,19 @@ export default function Settings() {
         </label>
 
         <label className="settings-field">
-          <span className="settings-label">API 地址（OpenAI-compatible）</span>
+          <span className="settings-label">{t('settings.baseUrl')}</span>
           <input className="settings-input" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} spellCheck={false} />
         </label>
 
         <label className="settings-field">
           <span className="settings-label">
-            API Key
-            {apiKey.length > 0 && <span className="settings-keylen">已输入 {apiKey.length} 字符{apiKey.startsWith('sk-or-v1-') ? ' · 格式正确' : ''}</span>}
+            {t('settings.apiKey')}
+            {apiKey.length > 0 && (
+              <span className="settings-keylen">
+                {t('settings.keyChars', { n: apiKey.length })}
+                {apiKey.startsWith('sk-or-v1-') ? ` ${t('settings.keyFormatOk')}` : ''}
+              </span>
+            )}
           </span>
           <div className="settings-key-row">
             <input
@@ -133,7 +148,7 @@ export default function Settings() {
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               onBlur={() => { if (apiKey.trim().length > 10) void testConnection() }}
-              placeholder={state?.has_key ? `${state.api_key_masked} — 留空保持不变` : 'sk-… 粘贴后自动测试连接'}
+              placeholder={state?.has_key ? `${state.api_key_masked} ${t('settings.keyKeep')}` : t('settings.keyPlaceholder')}
               spellCheck={false}
               autoComplete="off"
             />
@@ -141,8 +156,7 @@ export default function Settings() {
               type="button"
               className="settings-eye"
               onClick={() => setShowKey((v) => !v)}
-              aria-label={showKey ? '隐藏 Key' : '显示 Key'}
-              title={showKey ? '隐藏' : '显示明文'}
+              aria-label={showKey ? 'hide' : 'show'}
             >
               {showKey ? (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -162,7 +176,7 @@ export default function Settings() {
         </label>
 
         <label className="settings-field">
-          <span className="settings-label">模型</span>
+          <span className="settings-label">{t('settings.model')}</span>
           <input className="settings-input" value={model} onChange={(e) => setModel(e.target.value)} spellCheck={false} />
         </label>
 
@@ -173,15 +187,15 @@ export default function Settings() {
             checked={mock}
             onChange={(e) => setMock(e.target.checked)}
           />
-          <span>Mock 引擎（无需 Key，本地演示全流程）</span>
+          <span>{t('settings.mockToggle')}</span>
         </label>
 
         <div className="settings-actions">
           <button className="settings-test" onClick={testConnection} disabled={testing}>
-            {testing ? '测试中…' : '测试连接'}
+            {testing ? t('settings.testing') : t('settings.test')}
           </button>
           <button className="settings-save" onClick={save} disabled={saving}>
-            {saving ? '保存中…' : '保存并生效'}
+            {saving ? t('settings.saving') : t('settings.save')}
           </button>
         </div>
         {testResult && (
@@ -192,9 +206,27 @@ export default function Settings() {
         {msg && <p className="settings-msg">{msg}</p>}
         {err && <p className="settings-err" role="alert">{err}</p>}
 
-        <p className="settings-note">
-          配置写入 <code>backend/.env</code>，保存后立即生效（无需重启）。Key 只保存在你本机。
-        </p>
+        <p className="settings-note">{t('settings.note')}</p>
+
+        <label className="settings-field">
+          <span className="settings-label">{t('settings.language')}</span>
+          <div className="settings-presets">
+            <button
+              type="button"
+              className={`settings-preset${lang === 'zh' ? ' is-active' : ''}`}
+              onClick={() => setLang('zh')}
+            >
+              中文
+            </button>
+            <button
+              type="button"
+              className={`settings-preset${lang === 'en' ? ' is-active' : ''}`}
+              onClick={() => setLang('en')}
+            >
+              English
+            </button>
+          </div>
+        </label>
       </section>
     </main>
   )

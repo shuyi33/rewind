@@ -79,9 +79,25 @@ SYSTEM_PROMPT = """你是 Rewind，一个 Project Recovery Agent。你的唯一�
 findings 覆盖面要求：尽量覆盖项目的主要功能区域（包括已完成的），每个区域一条；
 无法判断的区域必须出现 unknown 条目。"""
 
+_LANG_INSTRUCTION = {
+    "en": "\n\n## OUTPUT LANGUAGE (mandatory)\n\nWrite ALL report text content — goal, summary, every finding title/detail/reasoning, every suggestion, project_map.notes and pages — in English. Keep file paths, code identifiers and the four status enum values unchanged.",
+}
 
 
-def user_brief(project_path: str, goal: str | None, last_analyzed: bool) -> str:
+def system_prompt(lang: str = "zh") -> str:
+    return SYSTEM_PROMPT + _LANG_INSTRUCTION.get(lang, "")
+
+
+def user_brief(project_path: str, goal: str | None, last_analyzed: bool, lang: str = "zh") -> str:
+    if lang == "en":
+        parts = ["Please diagnose this project: " + project_path]
+        parts.append("Previous analysis: " + ("analyzed before (re-verify)" if last_analyzed else "first analysis") + ".")
+        if goal:
+            parts.append("User-provided goal: “" + goal + "” — use it as a key reference for state judgments.")
+        else:
+            parts.append("No goal provided: extract it from README / docs first; if none, mark it unknown honestly.")
+        parts.append("Start calling tools to collect evidence. Remember: write the final report in English.")
+        return "\n".join(parts)
     parts = [
         f"请诊断这个项目：{project_path}",
         f"项目上次分析：{'此前分析过（请重新核实）' if last_analyzed else '首次分析'}。",
@@ -92,3 +108,5 @@ def user_brief(project_path: str, goal: str | None, last_analyzed: bool) -> str:
         parts.append("用户未提供项目目标：请优先从 README / 文档中提取；提取不到就在报告中如实标记 unknown。")
     parts.append("请开始调用工具收集证据。")
     return "\n".join(parts)
+
+

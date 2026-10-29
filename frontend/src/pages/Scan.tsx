@@ -4,11 +4,13 @@ import { subscribeEvents } from '../api/client'
 import type { AgentEvent } from '../types'
 import { PhaseProgress } from '../components/PhaseProgress'
 import { ToolLog, type LogEntry } from '../components/ToolLog'
+import { useI18n } from '../i18n'
 
 /** 扫描页：订阅 SSE 事件流，展示真实阶段与 Agent 的每一步工具调用（简洁过渡页）。 */
 export default function Scan() {
   const { reportId } = useParams()
   const navigate = useNavigate()
+  const { t } = useI18n()
   const [phase, setPhase] = useState<string | null>(null)
   const [finished, setFinished] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +63,7 @@ export default function Scan() {
       <header className="scan-head">
         <div>
           <h1 className="scan-title">
-            {finished ? '回溯完成' : '正在回溯'}
+            {finished ? t('scan.finished') : t('scan.running')}
           </h1>
           {scanPath && <p className="scan-path">{scanPath}</p>}
         </div>
@@ -70,16 +72,16 @@ export default function Scan() {
 
       {error ? (
         <div className="scan-error" role="alert">
-          分析失败：{error}
+          {t('scan.failed')}{error}
           <div className="scan-error-back">
-            <Link to="/">← 返回重新开始</Link>
+            <Link to="/">{t('scan.backHome')}</Link>
           </div>
         </div>
       ) : (
         <ToolLog entries={entries} />
       )}
 
-      {finished && !error && <p className="scan-done">证据已收齐，正在打开诊断报告…</p>}
+      {finished && !error && <p className="scan-done">{t('scan.done')}</p>}
     </main>
   )
 }

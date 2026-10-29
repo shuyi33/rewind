@@ -733,25 +733,25 @@
         <span class="glyph" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M8 14V9"/><path d="M8 9c0-2.4 1.7-4.3 4-4.3.2 2.6-1.6 4.6-4 4.3Z"/><path d="M8 10.5C7.9 8.4 6.4 6.8 4.4 6.8 4.3 8.9 5.9 10.6 8 10.5Z"/></svg>
         </span>
-        <span>诊断</span>
+        <span data-rw-i18n="dock1">诊断</span>
       </a>
       <a class="dock-item" data-dock data-spec data-burst href="#" style="--d:230ms" data-rw="scan">
         <span class="glyph" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M1.6 12.4c2.4-3.4 4.3-5.1 5.7-5.1 2 0 3 3.6 5 3.6 1.1 0 1.9-.5 2.4-1.4"/><path d="M4.3 6.2C5.5 4.4 6.6 3.5 7.6 3.5c1.5 0 2.2 2.4 3.7 2.4"/></svg>
         </span>
-        <span>证据</span>
+        <span data-rw-i18n="dock2">证据</span>
       </a>
       <a class="dock-item" data-dock data-spec data-burst href="#" style="--d:280ms" data-rw="report">
         <span class="glyph" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M4 2.4h5.3L12 5.1v8.5H4z"/><path d="M9.2 2.4V5h2.7"/><path d="M6 8.4h4M6 10.8h2.8"/></svg>
         </span>
-        <span>报告</span>
+        <span data-rw-i18n="dock3">报告</span>
       </a>
       <a class="dock-item dock-item--enter" data-dock data-spec data-burst href="#" style="--d:330ms">
         <span class="glyph" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M6.6 2.5h5.1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6.6"/><path d="M2.6 8h6.6"/><path d="m7 5.6 2.4 2.4L7 10.4"/></svg>
         </span>
-        <span>回溯</span>
+        <span data-rw-i18n="dock4">回溯</span>
       </a>
     </nav>
   </div>
@@ -774,11 +774,11 @@
     
 
     <h1 class="headline" style="--pd:18; --pr:1.2">
-      <span><i style="--d:260ms">把烂尾的项目，</i></span>
-      <span><i style="--d:360ms">重新看清楚。</i></span>
+      <span><i style="--d:260ms" data-rw-i18n="h1a">把烂尾的项目，</i></span>
+      <span><i style="--d:360ms" data-rw-i18n="h1b">重新看清楚。</i></span>
     </h1>
 
-    <p class="lede mask" style="--d:480ms; --pd:14; --pr:1">它替你重新读懂一个很久没碰的项目——代码、Git 历史、TODO、构建状态，一切用证据说话，不假装知道。</p>
+    <p class="lede mask" style="--d:480ms; --pd:14; --pr:1" data-rw-i18n="lede">它替你重新读懂一个很久没碰的项目——代码、Git 历史、TODO、构建状态，一切用证据说话，不假装知道。</p>
 
     <dl class="stat stat--a mask" style="--d:700ms; --pd:12">
       <span class="mark" aria-hidden="true">
@@ -788,7 +788,7 @@
           <circle cx="15" cy="15" r="1.1" fill="currentColor" stroke="none"/>
         </svg>
       </span>
-      <div><dt>最后一次提交</dt><dd id="rw-stat-days">157 天前</dd></div>
+      <div><dt data-rw-i18n="statDays">最后一次提交</dt><dd id="rw-stat-days">157 天前</dd></div>
     </dl>
 
     <dl class="stat stat--b mask" style="--d:770ms; --pd:13">
@@ -801,11 +801,11 @@
           <circle cx="15" cy="15" r="3.6"/>
         </svg>
       </span>
-      <div><dt>显式 TODO</dt><dd id="rw-stat-todo">7 处待办</dd></div>
+      <div><dt data-rw-i18n="statTodo">显式 TODO</dt><dd id="rw-stat-todo">7 处待办</dd></div>
     </dl>
 
     <article class="card card--stove mask" style="--d:880ms; --pd:22; --pr:2.4">
-      <p class="label">诊断样例 07</p>
+      <p class="label" data-rw-i18n="demoLabel">诊断样例 07</p>
       <h2>Pocket Ledger</h2>
       <figure class="portal" data-delay="1080">
         <span class="portal-media"><img src="inner-green-assets/card-ecostove.jpg" alt="Moss-covered boulders in a misty grove" loading="eager" decoding="async"></span>
@@ -819,7 +819,7 @@
       </button>
     </article>
 
-    <a class="scroll mask" style="--d:1040ms; --pd:9" href="#">继续回溯<span class="track"></span></a>
+    <a class="scroll mask" style="--d:1040ms; --pd:9" href="#"><span data-rw-i18n="scroll">继续回溯</span><span class="track"></span></a>
 
   </div>
 </main>
@@ -4260,24 +4260,67 @@ window.__seek   = v => { clock = v; drawn = null; };
 </script>
 
 <script>
-/* Rewind 桥接 v5：dock 导航 / 大按钮聚焦 / 样例卡直连（不改动上游脚本） */
+/* Rewind 桥接 v6：dock 导航 / 聚焦 / 样例卡 / 统计同步 / 双语切换（不改动上游脚本） */
 (function(){
+  var LANG = 'zh';
+  var EN = {
+    h1a: 'Abandoned projects,',
+    h1b: 'seen clearly again.',
+    lede: "It re-reads a project you haven't touched in months \u2014 code, git history, TODOs, build status \u2014 every conclusion backed by evidence. It never pretends to know.",
+    dock1: 'Diagnose', dock2: 'Evidence', dock3: 'Report', dock4: 'Rewind',
+    statDays: 'Last commit', statTodo: 'Explicit TODOs',
+    demoLabel: 'Sample diagnosis 07',
+    scroll: 'Continue',
+    daysAgo: ' days ago', todoN: ' pending'
+  };
+  var ZH = {
+    h1a: '\u628a\u70c2\u5c3e\u7684\u9879\u76ee\uff0c',
+    h1b: '\u91cd\u65b0\u770b\u6e05\u695a\u3002',
+    lede: '\u5b83\u66ff\u4f60\u91cd\u65b0\u8bfb\u61c2\u4e00\u4e2a\u5f88\u4e45\u6ca1\u78b0\u7684\u9879\u76ee\u2014\u2014\u4ee3\u7801\u3001Git \u5386\u53f2\u3001TODO\u3001\u6784\u5efa\u72b6\u6001\uff0c\u4e00\u5207\u7528\u8bc1\u636e\u8bf4\u8bdd\uff0c\u4e0d\u5047\u88c5\u77e5\u9053\u3002',
+    dock1: '\u8bca\u65ad', dock2: '\u8bc1\u636e', dock3: '\u62a5\u544a', dock4: '\u56de\u6eaf',
+    statDays: '\u6700\u540e\u4e00\u6b21\u63d0\u4ea4', statTodo: '\u663e\u5f0f TODO',
+    demoLabel: '\u8bca\u65ad\u6837\u4f8b 07',
+    scroll: '\u7ee7\u7eed\u56de\u6eaf',
+    daysAgo: ' \u5929\u524d', todoN: ' \u5904\u5f85\u529e'
+  };
+  var lastStats = null;
+
   function send(msg){ try{ parent.postMessage(msg, '*'); }catch(e){} }
+  function applyLang(){
+    var d = LANG === 'en' ? EN : ZH;
+    document.querySelectorAll('[data-rw-i18n]').forEach(function(el){
+      var k = el.getAttribute('data-rw-i18n');
+      if(d[k]) el.textContent = d[k];
+    });
+    renderStats();
+  }
+  function renderStats(){
+    if(!lastStats) return;
+    var d = LANG === 'en' ? EN : ZH;
+    var dd1 = document.getElementById('rw-stat-days');
+    var dd2 = document.getElementById('rw-stat-todo');
+    if(dd1 && lastStats.days != null) dd1.textContent = lastStats.days + d.daysAgo;
+    if(dd2 && lastStats.todo != null) dd2.textContent = lastStats.todo + d.todoN;
+  }
+
   document.querySelectorAll('.liquid-button--explore, .dock-item--enter').forEach(function(el){
     el.addEventListener('click', function(){ send({ type: 'rewind:focus' }); });
   });
   var stove = document.querySelector('.card--stove');
   if(stove){ stove.addEventListener('click', function(){ send({ type: 'rewind:demo' }); }); }
-  window.addEventListener('message', function(e){
-    var d = e.data || {};
-    if(d.type !== 'rewind:stats') return;
-    var dd1 = document.getElementById('rw-stat-days');
-    var dd2 = document.getElementById('rw-stat-todo');
-    if(dd1 && d.days != null) dd1.textContent = d.days + ' 天前';
-    if(dd2 && d.todo != null) dd2.textContent = d.todo + ' 处待办';
-  });
   document.querySelectorAll('[data-rw]').forEach(function(el){
     el.addEventListener('click', function(ev){ ev.preventDefault(); send({ type: 'rewind:nav', to: el.getAttribute('data-rw') }); });
+  });
+  window.addEventListener('message', function(e){
+    var d = e.data || {};
+    if(d.type === 'rewind:lang'){
+      if(d.lang === 'en' || d.lang === 'zh'){ LANG = d.lang; applyLang(); }
+      return;
+    }
+    if(d.type === 'rewind:stats'){
+      lastStats = { days: d.days, todo: d.todo };
+      renderStats();
+    }
   });
 })();
 </script>

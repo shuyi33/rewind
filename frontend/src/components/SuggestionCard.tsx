@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import type { Suggestion } from '../types'
 import { EvidenceList } from './EvidenceList'
+import { useI18n } from '../i18n'
 
 /** 恢复建议条目：可展开「为什么 / 证据 / 涉及文件 / 前置依赖 / 影响」。 */
 export function SuggestionCard({ index, suggestion }: { index: number; suggestion: Suggestion }) {
   const [open, setOpen] = useState(index === 0)
+  const { t } = useI18n()
   return (
     <div className="suggestion-item">
       <button className="suggestion-head" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
@@ -16,19 +18,19 @@ export function SuggestionCard({ index, suggestion }: { index: number; suggestio
       </button>
       {open ? (
         <div className="suggestion-body">
-          <h4>为什么建议现在做</h4>
+          <h4>{t('report.whyNow')}</h4>
           <p style={{ margin: 0 }}>{suggestion.why_now}</p>
 
           {suggestion.evidence?.length > 0 ? (
             <>
-              <h4>证据</h4>
+              <h4>{t('report.evidence')}</h4>
               <EvidenceList evidence={suggestion.evidence} />
             </>
           ) : null}
 
           {suggestion.related_files?.length > 0 ? (
             <>
-              <h4>涉及文件</h4>
+              <h4>{t('report.relatedFiles')}</h4>
               <div className="dep-row">
                 {suggestion.related_files.map((f) => (
                   <span key={f} className="dep-chip mono-sm">{f}</span>
@@ -37,7 +39,7 @@ export function SuggestionCard({ index, suggestion }: { index: number; suggestio
             </>
           ) : null}
 
-          <h4>前置依赖</h4>
+          <h4>{t('report.dependsOn')}</h4>
           {suggestion.depends_on?.length ? (
             <div className="dep-row">
               {suggestion.depends_on.map((d, i) => (
@@ -45,12 +47,12 @@ export function SuggestionCard({ index, suggestion }: { index: number; suggestio
               ))}
             </div>
           ) : (
-            <p style={{ margin: 0 }}>无</p>
+            <p style={{ margin: 0 }}>—</p>
           )}
 
           {suggestion.impact ? (
             <>
-              <h4>预计影响</h4>
+              <h4>{t('report.impact')}</h4>
               <p style={{ margin: 0 }}>{suggestion.impact}</p>
             </>
           ) : null}

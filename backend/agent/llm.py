@@ -58,7 +58,8 @@ class MockLLM:
     工具真实返回；无法判断的条目显式标记 unknown。
     """
 
-    def __init__(self):
+    def __init__(self, lang: str = 'zh'):
+        self.lang = lang
         self._plan_pos = 0
         self._collected: list[dict] = []  # [{name, arguments, result}]
         self._pending: dict | None = None  # 已发出、等待结果的调用
@@ -108,13 +109,13 @@ class MockLLM:
 
         # 计划完成 → 生成最终报告（启发式，基于真实证据）
         from agent.heuristic import build_heuristic_report
-        report = build_heuristic_report(self._collected)
+        report = build_heuristic_report(self._collected, lang=self.lang)
         return LLMResponse(content="```json\n" + json.dumps(report, ensure_ascii=False) + "\n```")
 
 
-def get_llm():
+def get_llm(lang: str = 'zh'):
     if settings.MOCK_LLM:
-        return MockLLM()
+        return MockLLM(lang)
     if not settings.LLM_API_KEY:
         raise RuntimeError("未配置 LLM_API_KEY（或在环境变量 REWIND_MOCK_LLM=1 启用本地 Mock）")
     return RealLLM()

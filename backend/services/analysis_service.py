@@ -57,7 +57,7 @@ def _sse(ev: dict) -> str:
     return f"data: {json.dumps(ev, ensure_ascii=False)}\n\n"
 
 
-async def start_analysis(path: str, goal: str | None):
+async def start_analysis(path: str, goal: str | None, lang: str = "zh"):
     """校验路径 → 建档 → 启动后台 Agent 任务。"""
     result = validate_path(path)
     if not result.valid:
@@ -80,14 +80,14 @@ async def start_analysis(path: str, goal: str | None):
     hub = _Hub()
     _registry[report_id] = hub
 
-    asyncio.create_task(_run_agent_task(report_id, project["id"], result.path, goal))
+    asyncio.create_task(_run_agent_task(report_id, project["id"], result.path, goal, lang))
     return {"report_id": report_id, "project_id": project["id"]}
 
 
-async def _run_agent_task(report_id: str, project_id: str, root: str, goal: str | None):
+async def _run_agent_task(report_id: str, project_id: str, root: str, goal: str | None, lang: str = "zh"):
     hub = _registry[report_id]
     try:
-        outcome = await run_diagnosis(root, goal, hub.publish)
+        outcome = await run_diagnosis(root, goal, hub.publish, lang)
         db.complete_report(
             report_id=report_id,
             summary=outcome["report"]["summary"],
