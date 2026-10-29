@@ -44,6 +44,8 @@ Rewind 在你本机运行，分析的是本机路径下的项目，代码不经�
 
 步数用尽还没产出报告时，只要收集过证据，会降级为启发式报告并明确标注来源，而不是失败或编造。数据库是本地 SQLite，历史报告可回看、可补充项目目标。
 
+![Agent 扫描过程](docs/screenshots/scan.png)
+
 ![诊断报告](docs/screenshots/report.png)
 
 ## 测试

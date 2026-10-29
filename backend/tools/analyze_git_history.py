@@ -15,6 +15,23 @@ TOOL_NAME = "analyze_git_history"
 
 GIT_TIMEOUT = 15  # 秒
 
+_T = {
+    "zh": {
+        "today": "今天", "days": "{d} 天前",
+        "months": "约 {m} 个月前（{d} 天）", "years": "约 {y} 年前（{d} 天）",
+        "no_git_note": "项目不是 Git 仓库（或 git 不可用），无法提供历史证据。",
+        "recent": "最近 30 天内有提交", "last_at": "最后一次提交于 {r}", "no_commits": "无提交记录",
+        "git_fail": "git 命令不可用", "git_timeout": "git 命令超时", "invalid_root": "项目路径无效: {p}",
+    },
+    "en": {
+        "today": "today", "days": "{d} days ago",
+        "months": "about {m} months ago ({d} days)", "years": "about {y} years ago ({d} days)",
+        "no_git_note": "Not a git repository (or git unavailable) — no history evidence.",
+        "recent": "commits within the last 30 days", "last_at": "last commit {r}", "no_commits": "no commits",
+        "git_fail": "git unavailable", "git_timeout": "git timed out", "invalid_root": "invalid project path: {p}",
+    },
+}
+
 
 async def _git(root: str, *args: str) -> tuple[int, str]:
     def run():
@@ -27,9 +44,9 @@ async def _git(root: str, *args: str) -> tuple[int, str]:
             )
             return proc.returncode, (proc.stdout or proc.stderr).strip()
         except FileNotFoundError:
-            return 127, "git 命令不可用"
+            return 127, "git command unavailable"
         except subprocess.TimeoutExpired:
-            return 124, "git 命令超时"
+            return 124, "git timed out"
 
     return await asyncio.to_thread(run)
 
@@ -55,27 +72,31 @@ def _days_ago(iso_date: str) -> int | None:
     return (date.today() - d).days
 
 
-def _human_days(days: int) -> str:
+def _human_days(days: int | None, lang: str = "zh") -> str | None:
+    M = _T.get(lang, _T["zh"])
+    if days is None:
+        return None
     if days <= 0:
-        return "今天"
+        return M["today"]
     if days < 30:
-        return f"{days} 天前"
+        return M["days"].format(d=days)
     if days < 365:
-        return f"约 {days // 30} 个月前（{days} 天）"
-    return f"约 {days // 365} 年前（{days} 天）"
+        return M["months"].format(m=days // 30, d=days)
+    return M["years"].format(y=days // 365, d=days)
 
 
-async def analyze_git_history(project_root: str, max_commits: int = 30) -> dict:
+async def analyze_git_history(project_root: str, max_commits: int = 30, lang: str = "zh") -> dict:
+    M = _T.get(lang, _T["zh"])
     root = project_root_path(project_root)
     if root is None:
-        return {"error": f"项目路径无效: {project_root}"}
+        return {"error": M["invalid_root"].format(p=project_root)}
     root = str(root)
 
     code, out = await _git(root, "rev-parse", "--is-inside-work-tree")
     if code != 0 or out.strip() != "true":
         return {
             "has_git": False,
-            "note": "项目不是 Git 仓库（或 git 不可用），无法提供历史证据。",
+            "note": M["no_git_note"],
         }
 
     branch_code, branch = await _git(root, "branch", "--show-current")
@@ -107,7 +128,7 @@ async def analyze_git_history(project_root: str, max_commits: int = 30) -> dict:
         if c:
             d = _days_ago(c["date"])
             c["days_ago"] = d
-            c["relative"] = _human_days(d) if d is not None else None
+            c["relative"] = _human_days(d, lang)
 
     last_days = _days_ago(last_commit["date"]) if last_commit else None
     active_recently = (last_days is not None and last_days <= 30)
@@ -123,8 +144,8 @@ async def analyze_git_history(project_root: str, max_commits: int = 30) -> dict:
         "last_commit": last_commit,
         "active_recently": active_recently,
         "last_commit_note": (
-            "最近 30 天内有提交" if active_recently else
-            (f"最后一次提交于 {last_commit['relative']}" if last_commit else "无提交记录")
+            M["recent"] if active_recently else
+            (M["last_at"].format(r=last_commit["relative"]) if last_commit else M["no_commits"])
         ),
         "uncommitted_changes": len(uncommitted),
         "uncommitted_sample": uncommitted[:10],

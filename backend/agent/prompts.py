@@ -80,7 +80,7 @@ findings 覆盖面要求：尽量覆盖项目的主要功能区域（包括已�
 无法判断的区域必须出现 unknown 条目。"""
 
 _LANG_INSTRUCTION = {
-    "en": "\n\n## OUTPUT LANGUAGE (mandatory)\n\nWrite ALL report text content — goal, summary, every finding title/detail/reasoning, every suggestion, project_map.notes and pages — in English. Keep file paths, code identifiers and the four status enum values unchanged.",
+    "en": "\n\n## OUTPUT LANGUAGE (mandatory)\n\nWrite ALL report text content — goal, summary, every finding title/detail/reasoning, every suggestion, project_map.notes and pages — in English. Translate the goal into English even if the source README is written in another language. Keep file paths, code identifiers and the four status enum values unchanged. Do not mix other languages into summary or findings text.",
 }
 
 

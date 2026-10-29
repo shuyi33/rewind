@@ -44,6 +44,8 @@ Security is designed in, not bolted on: file access must resolve inside the proj
 
 If the step budget runs out before a report is ready, it falls back to a heuristic report built from whatever evidence was collected — clearly labeled, never fabricated. Reports persist to local SQLite and can be revisited or annotated with the project goal later.
 
+![Agent scanning a project](docs/screenshots/scan.png)
+
 ![Diagnosis report](docs/screenshots/report.png)
 
 ## Tests

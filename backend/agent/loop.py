@@ -137,7 +137,7 @@ class AgentRunner:
                                "label": PHASE_LABELS.get(phase, "正在分析")})
                     self.emit({"type": "tool_call", "step": step, "tool": name,
                                "args": args, "phase": phase})
-                    outcome = await execute_tool(self.root, name, args)
+                    outcome = await execute_tool(self.root, name, args, self.lang)
                     summary = summarize_tool(name, outcome, self.lang)
                     self.emit({"type": "tool_result", "step": step, "tool": name,
                                "ok": bool(outcome["ok"]), "summary": summary,

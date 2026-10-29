@@ -6,6 +6,7 @@
 - phase: 工具对应的前端扫描阶段（真实进度，非假百分比）
 """
 
+import inspect
 import time
 import traceback
 
@@ -155,7 +156,7 @@ def phase_of(tool_name: str) -> str:
     return _phase_map().get(tool_name, "evidence")
 
 
-async def execute_tool(project_root: str, tool_name: str, args: dict) -> dict:
+async def execute_tool(project_root: str, tool_name: str, args: dict, lang: str = "zh") -> dict:
     """统一执行入口。返回 {ok, result | error, duration_ms, phase}。"""
     meta = TOOLS.get(tool_name)
     if not meta:
@@ -164,7 +165,10 @@ async def execute_tool(project_root: str, tool_name: str, args: dict) -> dict:
     start = time.monotonic()
     try:
         cleaned = {k: v for k, v in (args or {}).items() if v is not None}
-        result = await meta["handler"](project_root, **cleaned)
+        handler = meta["handler"]
+        if "lang" in inspect.signature(handler).parameters:
+            cleaned.setdefault("lang", lang)
+        result = await handler(project_root, **cleaned)
         duration = int((time.monotonic() - start) * 1000)
         return {"ok": "error" not in result, "result": result,
                 "error": result.get("error"), "duration_ms": duration,

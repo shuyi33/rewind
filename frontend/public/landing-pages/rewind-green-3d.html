@@ -4304,12 +4304,13 @@ window.__seek   = v => { clock = v; drawn = null; };
     renderStats();
   }
   function renderStats(){
-    if(!lastStats) return;
     var d = LANG === 'en' ? EN : ZH;
     var dd1 = document.getElementById('rw-stat-days');
     var dd2 = document.getElementById('rw-stat-todo');
-    if(dd1 && lastStats.days != null) dd1.textContent = lastStats.days + d.daysAgo;
-    if(dd2 && lastStats.todo != null) dd2.textContent = lastStats.todo + d.todoN;
+    var n1 = lastStats && lastStats.days != null ? lastStats.days : (dd1 ? (parseInt(dd1.textContent, 10) || null) : null);
+    var n2 = lastStats && lastStats.todo != null ? lastStats.todo : (dd2 ? (parseInt(dd2.textContent, 10) || null) : null);
+    if(dd1 && n1 != null) dd1.textContent = n1 + d.daysAgo;
+    if(dd2 && n2 != null) dd2.textContent = n2 + d.todoN;
   }
 
   document.querySelectorAll('.liquid-button--explore, .dock-item--enter').forEach(function(el){
